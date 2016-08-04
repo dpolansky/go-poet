@@ -10,9 +10,10 @@ func main() {
 	f := gopoet.NewFuncSpec("main")
 	fmtImport := gopoet.Import{
 		Package: "fmt",
+		Name:    "Println",
 	}
 
-	f.Statement("fmt.Println(\"Hello World\")", fmtImport)
+	f.Statement("$T($S)", fmtImport, "Hello Kevin")
 
 	fileSpec := gopoet.NewFileSpec("blah")
 	fileSpec.CodeBlock(f)

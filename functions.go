@@ -1,9 +1,6 @@
 package gopoet
 
-import (
-	"bytes"
-	"reflect"
-)
+import "reflect"
 
 // FuncSpec represents information needed to write a function
 type FuncSpec struct {
@@ -26,11 +23,23 @@ func NewFuncSpec(name string) *FuncSpec {
 }
 
 func (f *FuncSpec) String() string {
-	var buffer bytes.Buffer
+	writer := NewCodeWriter()
 
-	buffer.WriteString("func " + f.Name + "() {}")
+	writer.WriteStatement(Statement{
+		Indent: 1,
+		Format: "func " + f.Name + "() {",
+	})
 
-	return buffer.String()
+	for _, st := range f.Statements {
+		writer.WriteStatement(st)
+	}
+
+	writer.WriteStatement(Statement{
+		Indent: -1,
+		Format: "}",
+	})
+
+	return writer.String()
 }
 
 func (f *FuncSpec) Packages() []ImportSpec {

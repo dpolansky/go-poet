@@ -32,21 +32,21 @@ func ImportFromInstance(t interface{}) Import {
 }
 
 // GetPackage returns the package name for this import
-func (i *Import) GetPackage() string {
+func (i Import) GetPackage() string {
 	return i.Package
 }
 
 // GetPackageAlias returns the alias for referencing the package
-func (i *Import) GetPackageAlias() string {
+func (i Import) GetPackageAlias() string {
 	return i.Alias
 }
 
 // NeedsQualifier returns whether the name needs to be qualified with the package/alias
-func (i *Import) NeedsQualifier() bool {
+func (i Import) NeedsQualifier() bool {
 	return !i.Unqualified
 }
 
 // GetName returns the name of the type/function being referenced within the package.
-func (i *Import) GetName() string {
+func (i Import) GetName() string {
 	return i.Name
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"gitlab.com/kdeenanauth/gopoet/src/gopoet"
+	"gitlab.com/kdeenanauth/gopoet"
 )
 
 func main() {

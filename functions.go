@@ -113,6 +113,7 @@ func (f *FuncSpec) ResultParameter(name string, spec ImportSpec) *FuncSpec {
 	return f
 }
 
+// FunctionComment adds a comment to the function
 func (f *FuncSpec) FunctionComment(comment string) *FuncSpec {
 	f.Comment = comment
 

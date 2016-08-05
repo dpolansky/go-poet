@@ -5,14 +5,6 @@ type CodeBlock interface {
 	Packages() []ImportSpec
 }
 
-type MethodSpec struct {
-	// CodeBlock
-
-	FuncSpec
-	ReceiverName string
-	Receiver     *StructSpec
-}
-
 type Identifier struct {
 	Name string
 	Type ImportSpec

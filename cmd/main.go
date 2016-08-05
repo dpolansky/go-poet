@@ -1,71 +1,45 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 
 	"gitlab.com/kdeenanauth/gopoet"
 )
 
+type blah struct {
+}
+
 func main() {
-	f := gopoet.NewFuncSpec("main")
 	fmtImport := gopoet.Import{
 		Package: "fmt",
 		Name:    "Println",
 	}
 
-	f.Parameter("myStr", gopoet.ImportString())
-	f.Parameter("someBuffer", gopoet.ImportFromInstance(bytes.Buffer{}))
-	f.ResultParameter("result", gopoet.ImportInt())
-	f.ResultParameter("_", gopoet.ImportString())
-	f.BlockStart("for (i := 0; i < 5; i++)")
-	f.Statement("$T($S)", fmtImport, "I Make Gains")
-	f.BlockEnd()
-	f.Statement("$T($S)", fmtImport, "Hello Kevin")
+	sampleStruct := gopoet.NewStructSpec("A")
+	blahStruct := gopoet.ImportFromInstance(blah{})
+	blahStruct.Unqualified = true
 
-	fileSpec := gopoet.NewFileSpec("blah")
-	fileSpec.CodeBlock(f)
+	sampleMethodSpec := gopoet.NewMethodSpec("sampleMethod", "a", false, sampleStruct)
+	blahSpec := gopoet.NewMethodSpec("blahMethod", "b", true, blahStruct)
 
-	structSpec := gopoet.NewStructSpec("foo")
-	structSpec.StructComment("this is a comment")
-	structSpec.FieldWithTag("test", gopoet.ImportString(), "test")
-	structSpec.Field("blah", gopoet.ImportInt())
-	structSpec.Field("buf", gopoet.ImportFromInstance(bytes.Buffer{}))
+	sampleStruct.AttachMethod("blahMethod", "b", false)
 
-	testInitPackage := gopoet.Import{
-		Package: "os",
-		Alias:   "_",
-	}
+	mainSpec := gopoet.NewFuncSpec("main")
+	mainSpec.Statement("$T($S)", fmtImport, "Calling hello...")
 
-	interfSpec := gopoet.NewInterfaceSpec("baz")
-	interfSpec.Method(*f)
+	helloSpec := gopoet.NewFuncSpec("hello")
+	helloSpec.BlockStart("for i:= 0; i < 5; i++")
+	helloSpec.Statement("$T($L)", fmtImport, "i")
+	helloSpec.BlockEnd()
 
-	fileSpec.CodeBlock(interfSpec)
+	mainSpec.Statement("$L()", helloSpec.Name)
 
-	fileSpec.InitializationPackage(testInitPackage)
-	fileSpec.CodeBlock(structSpec)
+	fileSpec := gopoet.NewFileSpec("main")
+	fileSpec.CodeBlock(sampleStruct)
+	fileSpec.CodeBlock(mainSpec)
+	fileSpec.CodeBlock(helloSpec)
+	fileSpec.CodeBlock(sampleMethodSpec)
+	fileSpec.CodeBlock(blahSpec)
+
 	fmt.Println(fileSpec.String())
 }
-
-// myFmt := ImportDef.Get("fmt", nil)
-// blankImport := ImportDef.GetInitialization("fmt")
-// aliasImport := ImportDef.GetAlias("fmt", "tmf")
-// aliasImport := ImportDef.GetAliasedType("fmt", "tmf", "PrintLn")
-// unqualifiedFmt := ImportDef.GetUnqualified("fmt", "PrintLn")
-// myFmtPrintLn := ImportDef.Get("fmt", "PrintLn")
-
-// inlineStruct := StructSpec{}
-
-// mainSpec := FuncSpec { Name="main"}
-// mainSpec.AddStatement("$T.PrintLn($S)", ImportDef.Get("fmt"), "Hello World")
-// mainSpec.AddStatement("$T.($S)", myFmtPrintLn, "Hello World")
-// mainSpec.AddStatement("$T.helloStatic()", ImportDef.Get(A{}))
-// mainSpec.AddStatement("a := &$T{}", ImportDef.Get(A{}))
-// mainSpec.AddStatement("a.hello()")
-
-// fileSpec := FileSpec { Package="main" }
-// fileSpec.AddCodeBlock(mainSpec)
-// fileSpec.String()
-
-// intSpec := InterfaceSpec
-// intSpec.addMethod("Hello")

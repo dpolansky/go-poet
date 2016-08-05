@@ -75,14 +75,14 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 		}
 	}
 
-	formatStr.WriteString(") ")
+	formatStr.WriteString(")")
 
 	if len(f.ResultParameters) == 1 && f.ResultParameters[0].Name == "" {
 		formatStr.WriteString("$T")
 		arguments = append(arguments, f.ResultParameters[0].Type)
 	} else if len(f.ResultParameters) >= 1 {
 
-		formatStr.WriteString("(")
+		formatStr.WriteString(" (")
 		for i, resultParameter := range f.ResultParameters {
 			if resultParameter.Name == "" {
 				panic(fmt.Sprintf("Result parameters need a name when there is more than one (got %v)", resultParameter))

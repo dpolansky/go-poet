@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 
 	"gitlab.com/kdeenanauth/gopoet"
@@ -13,6 +14,13 @@ func main() {
 		Name:    "Println",
 	}
 
+	f.Parameter("myStr", gopoet.ImportString())
+	f.Parameter("someBuffer", gopoet.ImportFromInstance(bytes.Buffer{}))
+	f.ResultParameter("result", gopoet.ImportInt())
+	f.ResultParameter("_", gopoet.ImportString())
+	f.BlockStart("for (i := 0; i < 5; i++)")
+	f.Statement("$T($S)", fmtImport, "I Make Gains")
+	f.BlockEnd()
 	f.Statement("$T($S)", fmtImport, "Hello Kevin")
 
 	fileSpec := gopoet.NewFileSpec("blah")

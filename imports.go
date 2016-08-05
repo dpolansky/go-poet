@@ -13,6 +13,18 @@ type Import struct {
 	Unqualified bool
 }
 
+func ImportString() Import {
+	strImport := ImportFromInstance("")
+	strImport.Unqualified = true
+	return strImport
+}
+
+func ImportInt() Import {
+	strImport := ImportFromInstance(0)
+	strImport.Unqualified = true
+	return strImport
+}
+
 // ImportFromInstance creates an Import from an existing type
 func ImportFromInstance(t interface{}) Import {
 	reflectType := reflect.TypeOf(t)

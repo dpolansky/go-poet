@@ -1,6 +1,11 @@
 package gopoet
 
-import "reflect"
+import (
+	"bytes"
+	"fmt"
+	"reflect"
+	"strings"
+)
 
 // FuncSpec represents information needed to write a function
 type FuncSpec struct {
@@ -12,6 +17,8 @@ type FuncSpec struct {
 	ResultParameters []IdentifierParameter
 	Statements       []Statement
 }
+
+var _ = (*FuncSpec)(nil)
 
 func NewFuncSpec(name string) *FuncSpec {
 	return &FuncSpec{
@@ -25,21 +32,74 @@ func NewFuncSpec(name string) *FuncSpec {
 func (f *FuncSpec) String() string {
 	writer := NewCodeWriter()
 
-	writer.WriteStatement(Statement{
-		Indent: 1,
-		Format: "func " + f.Name + "() {",
-	})
+	writer.WriteStatement(f.createSignature())
 
 	for _, st := range f.Statements {
 		writer.WriteStatement(st)
 	}
 
 	writer.WriteStatement(Statement{
-		Indent: -1,
-		Format: "}",
+		BeforeIndent: -1,
+		Format:       "}",
 	})
 
 	return writer.String()
+}
+
+func (f *FuncSpec) createSignature() Statement {
+	formatStr := bytes.Buffer{}
+	arguments := []interface{}{}
+
+	// add comment to front of function
+	if f.Comment != "" {
+		formatttedComment := strings.Replace(f.Comment, "\n", "\n// ", -1)
+		formatStr.WriteString("// ")
+		formatStr.WriteString(formatttedComment)
+		formatStr.WriteString("\n")
+	}
+	formatStr.WriteString("func ")
+	formatStr.WriteString(f.Name)
+	formatStr.WriteString("(")
+
+	for i, param := range f.Parameters {
+		formatStr.WriteString("$L $T")
+		arguments = append(arguments, param.Name, param.Type)
+
+		if i != len(f.Parameters)-1 {
+			formatStr.WriteString(", ")
+		}
+	}
+
+	formatStr.WriteString(") ")
+
+	if len(f.ResultParameters) == 1 && f.ResultParameters[0].Name == "" {
+		formatStr.WriteString("$T")
+		arguments = append(arguments, f.ResultParameters[0].Type)
+	} else if len(f.ResultParameters) >= 1 {
+
+		formatStr.WriteString("(")
+		for i, resultParameter := range f.ResultParameters {
+			if resultParameter.Name == "" {
+				panic(fmt.Sprintf("Result parameters need a name when there is more than one (got %v)", resultParameter))
+			}
+
+			formatStr.WriteString("$L $T")
+			arguments = append(arguments, resultParameter.Name, resultParameter.Type)
+
+			if i != len(f.ResultParameters)-1 {
+				formatStr.WriteString(", ")
+			}
+		}
+		formatStr.WriteString(") ")
+	}
+
+	formatStr.WriteString("{")
+
+	return Statement{
+		AfterIndent: 1,
+		Format:      formatStr.String(),
+		Arguments:   arguments,
+	}
 }
 
 func (f *FuncSpec) Packages() []ImportSpec {
@@ -69,7 +129,6 @@ func (f *FuncSpec) Statement(format string, args ...interface{}) *FuncSpec {
 	f.Statements = append(f.Statements, Statement{
 		Format:    format,
 		Arguments: args,
-		Indent:    0,
 	})
 
 	return f
@@ -79,9 +138,9 @@ func (f *FuncSpec) Statement(format string, args ...interface{}) *FuncSpec {
 // block of code.
 func (f *FuncSpec) BlockStart(format string, args ...interface{}) *FuncSpec {
 	f.Statements = append(f.Statements, Statement{
-		Format:    format + " {",
-		Arguments: args,
-		Indent:    1,
+		Format:      format + " {",
+		Arguments:   args,
+		AfterIndent: 1,
 	})
 
 	return f
@@ -91,8 +150,8 @@ func (f *FuncSpec) BlockStart(format string, args ...interface{}) *FuncSpec {
 // block of code.
 func (f *FuncSpec) BlockEnd() *FuncSpec {
 	f.Statements = append(f.Statements, Statement{
-		Format: "}",
-		Indent: -1,
+		Format:       "}",
+		BeforeIndent: -1,
 	})
 
 	return f

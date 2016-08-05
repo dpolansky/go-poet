@@ -21,6 +21,9 @@ func Template(format string, args ...interface{}) string {
 			}
 
 			switch format[i+1] {
+			case 'L':
+				buffer.WriteString(args[currentArg].(string))
+				break
 			case 'T':
 				buffer.WriteString(getQualifiedNameFromArg(args[currentArg]))
 				break
@@ -58,9 +61,13 @@ func getQualifiedNameFromArg(obj interface{}) (result string) {
 	}
 
 	if importSpec.GetName() != "" {
-		result += "."
+		if importSpec.NeedsQualifier() {
+			result += "."
+		}
 		result += importSpec.GetName()
 	}
+
+	// TODO extend importSpec for * []
 
 	return result
 }

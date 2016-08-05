@@ -21,8 +21,9 @@ func (c *CodeWriter) WriteCode(code string) {
 }
 
 func (c *CodeWriter) WriteStatement(s Statement) {
+	c.currentIndent += s.BeforeIndent
 	c.WriteCode(Template(s.Format, s.Arguments...) + "\n")
-	c.currentIndent += s.Indent
+	c.currentIndent += s.AfterIndent
 }
 
 func (c *CodeWriter) String() string {

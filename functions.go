@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 // FuncSpec represents information needed to write a function
@@ -48,16 +47,22 @@ func (f *FuncSpec) String() string {
 
 func (f *FuncSpec) createSignature() Statement {
 	formatStr := bytes.Buffer{}
-	arguments := []interface{}{}
+	signature, args := f.Signature()
 
-	// add comment to front of function
-	if f.Comment != "" {
-		formatttedComment := strings.Replace(f.Comment, "\n", "\n// ", -1)
-		formatStr.WriteString("// ")
-		formatStr.WriteString(formatttedComment)
-		formatStr.WriteString("\n")
-	}
 	formatStr.WriteString("func ")
+	formatStr.WriteString(signature)
+	formatStr.WriteString(" {")
+
+	return Statement{
+		AfterIndent: 1,
+		Format:      formatStr.String(),
+		Arguments:   args,
+	}
+}
+
+func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
+	formatStr := bytes.Buffer{}
+
 	formatStr.WriteString(f.Name)
 	formatStr.WriteString("(")
 
@@ -90,16 +95,10 @@ func (f *FuncSpec) createSignature() Statement {
 				formatStr.WriteString(", ")
 			}
 		}
-		formatStr.WriteString(") ")
+		formatStr.WriteString(")")
 	}
 
-	formatStr.WriteString("{")
-
-	return Statement{
-		AfterIndent: 1,
-		Format:      formatStr.String(),
-		Arguments:   arguments,
-	}
+	return formatStr.String(), arguments
 }
 
 func (f *FuncSpec) Packages() []ImportSpec {

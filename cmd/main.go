@@ -26,6 +26,24 @@ func main() {
 	fileSpec := gopoet.NewFileSpec("blah")
 	fileSpec.CodeBlock(f)
 
+	structSpec := gopoet.NewStructSpec("foo")
+	structSpec.StructComment("this is a comment")
+	structSpec.FieldWithTag("test", gopoet.ImportString(), "test")
+	structSpec.Field("blah", gopoet.ImportInt())
+	structSpec.Field("buf", gopoet.ImportFromInstance(bytes.Buffer{}))
+
+	testInitPackage := gopoet.Import{
+		Package: "os",
+		Alias:   "_",
+	}
+
+	interfSpec := gopoet.NewInterfaceSpec("baz")
+	interfSpec.Method(*f)
+
+	fileSpec.CodeBlock(interfSpec)
+
+	fileSpec.InitializationPackage(testInitPackage)
+	fileSpec.CodeBlock(structSpec)
 	fmt.Println(fileSpec.String())
 }
 

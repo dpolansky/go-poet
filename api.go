@@ -33,21 +33,3 @@ type ImportSpec interface {
 	NeedsQualifier() bool
 	GetName() string
 }
-
-type InterfaceSpec struct {
-	// CodeBlock
-
-	Name               string
-	Comment            string
-	EmbeddedInterfaces []ImportSpec
-	Methods            []FuncSpec
-}
-
-type StructSpec struct {
-	// CodeBlock
-
-	Name    string
-	Comment string
-	Fields  []IdentifierField
-}
-

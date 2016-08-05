@@ -49,7 +49,7 @@ func Template(format string, args ...interface{}) string {
 func getQualifiedNameFromArg(obj interface{}) (result string) {
 	importSpec, ok := obj.(ImportSpec)
 	if !ok {
-		panic(fmt.Sprintf("$T must take an instance of ImportSpec, got type=%T %+v", obj, obj))
+		panic(fmt.Sprintf("$T must take an instance of ImportSpec, got type=%T %#v", obj, obj))
 	}
 
 	if importSpec.NeedsQualifier() {

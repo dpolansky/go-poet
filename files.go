@@ -19,10 +19,48 @@ func NewFileSpec(pkg string) *FileSpec {
 
 func (f *FileSpec) String() string {
 	var buffer bytes.Buffer
-	buffer.WriteString("package " + f.Package + "\n")
+	buffer.WriteString("package " + f.Package + "\n\n")
+	seen := map[string]struct{}{}
+
+	var packages []ImportSpec
+	for _, blk := range f.CodeBlocks {
+		packages = append(packages, blk.Packages()...)
+	}
+
+	if len(f.InitializationPackages) > 0 || len(packages) > 0 {
+		buffer.WriteString("import (\n")
+
+		for _, spec := range f.InitializationPackages {
+			if _, found := seen[spec.GetPackage()]; !found && spec.GetPackage() != "" {
+				buffer.WriteString("\t")
+				if spec.GetPackageAlias() != "" {
+					buffer.WriteString(spec.GetPackageAlias())
+					buffer.WriteString(" ")
+				}
+				buffer.WriteString("\"" + spec.GetPackage() + "\"\n")
+				seen[spec.GetPackage()] = struct{}{}
+
+			}
+		}
+
+		for _, spec := range packages {
+			if _, found := seen[spec.GetPackage()]; !found && spec.GetPackage() != "" {
+				buffer.WriteString("\t")
+				if spec.GetPackageAlias() != "" {
+					buffer.WriteString(spec.GetPackageAlias())
+					buffer.WriteString(" ")
+				}
+				buffer.WriteString("\"" + spec.GetPackage() + "\"\n")
+				seen[spec.GetPackage()] = struct{}{}
+			}
+		}
+
+		buffer.WriteString(")\n\n")
+	}
 
 	for _, codeBlk := range f.CodeBlocks {
 		buffer.WriteString(codeBlk.String())
+		buffer.WriteString("\n")
 	}
 
 	return buffer.String()

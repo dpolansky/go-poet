@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 
 	"gitlab.com/kdeenanauth/gopoet"
@@ -10,19 +11,30 @@ type blah struct {
 }
 
 func main() {
+	fileSpec := gopoet.NewFileSpec("main")
+	funcSpec := gopoet.NewFuncSpec("blah")
+	funcSpec.Parameter("a", gopoet.ImportFromInstance(&bytes.Buffer{}))
+	NewParameter("a", isPtr)
+	fileSpec.CodeBlock(funcSpec)
+	fmt.Println(fileSpec)
+}
+
+func mainOld() {
 	fmtImport := gopoet.Import{
 		Package: "fmt",
 		Name:    "Println",
 	}
 
 	sampleStruct := gopoet.NewStructSpec("A")
-	blahStruct := gopoet.ImportFromInstance(blah{})
+	blahStruct := gopoet.ImportFromInstance(bytes.Buffer{})
+	typeReference := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
+
 	blahStruct.Unqualified = true
 
 	sampleMethodSpec := gopoet.NewMethodSpec("sampleMethod", "a", false, sampleStruct)
 	blahSpec := gopoet.NewMethodSpec("blahMethod", "b", true, blahStruct)
 
-	sampleStruct.AttachMethod("blahMethod", "b", false)
+	sampleStruct.MethodAndAttach("blahMethod", "b", false)
 
 	mainSpec := gopoet.NewFuncSpec("main")
 	mainSpec.Statement("$T($S)", fmtImport, "Calling hello...")

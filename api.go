@@ -5,6 +5,15 @@ type CodeBlock interface {
 	GetImports() []Import
 }
 
+type Statement struct {
+	// CodeBlock
+
+	Format       string
+	Arguments    []interface{}
+	BeforeIndent int
+	AfterIndent  int
+}
+
 type Identifier struct {
 	Name string
 	Type TypeReference

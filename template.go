@@ -21,7 +21,7 @@ func Template(format string, args ...interface{}) string {
 
 			switch format[i+1] {
 			case 'L':
-				buffer.WriteString(args[currentArg].(string))
+				buffer.WriteString(fmt.Sprintf("%v", args[currentArg]))
 				break
 			case 'T':
 				buffer.WriteString(getQualifiedNameFromArg(args[currentArg]))
@@ -48,7 +48,7 @@ func Template(format string, args ...interface{}) string {
 func getQualifiedNameFromArg(obj interface{}) string {
 	typeRef, ok := obj.(TypeReference)
 	if !ok {
-		panic(fmt.Sprintf("$T must implement TypeRefernce, got type=%T %#v", obj, obj))
+		panic(fmt.Sprintf("$T must implement TypeReference, got type=%T %#v", obj, obj))
 	}
 
 	return typeRef.GetName()

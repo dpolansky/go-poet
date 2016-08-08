@@ -7,7 +7,7 @@ type CodeBlock interface {
 
 type Identifier struct {
 	Name string
-	Type ImportSpec
+	Type TypeReference
 }
 
 type IdentifierParameter struct {
@@ -24,4 +24,12 @@ type ImportSpec interface {
 	GetPackageAlias() string
 	NeedsQualifier() bool
 	GetName() string
+}
+
+type TypeReference interface {
+	ImportSpec
+}
+
+type TypeReferenceSpec struct {
+	Import
 }

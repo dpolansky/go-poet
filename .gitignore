@@ -1,3 +1,7 @@
+#VSCode
+.vscode
+debug
+
 *.exe
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

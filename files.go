@@ -4,7 +4,7 @@ import "bytes"
 
 type FileSpec struct {
 	Package                string
-	InitializationPackages []ImportSpec
+	InitializationPackages []Import
 	Init                   CodeBlock
 	CodeBlocks             []CodeBlock
 }
@@ -12,7 +12,7 @@ type FileSpec struct {
 func NewFileSpec(pkg string) *FileSpec {
 	return &FileSpec{
 		Package:                pkg,
-		InitializationPackages: []ImportSpec{},
+		InitializationPackages: []Import{},
 		CodeBlocks:             []CodeBlock{},
 	}
 }
@@ -22,7 +22,7 @@ func (f *FileSpec) String() string {
 	buffer.WriteString("package " + f.Package + "\n\n")
 	seen := map[string]struct{}{}
 
-	var packages []ImportSpec
+	var packages []Import
 	for _, blk := range f.CodeBlocks {
 		packages = append(packages, blk.Packages()...)
 	}
@@ -30,28 +30,27 @@ func (f *FileSpec) String() string {
 	if len(f.InitializationPackages) > 0 || len(packages) > 0 {
 		buffer.WriteString("import (\n")
 
-		for _, spec := range f.InitializationPackages {
-			if _, found := seen[spec.GetPackage()]; !found && spec.GetPackage() != "" {
+		for _, imp := range f.InitializationPackages {
+			if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
 				buffer.WriteString("\t")
-				if spec.GetPackageAlias() != "" {
-					buffer.WriteString(spec.GetPackageAlias())
+				if imp.GetAlias() != "" {
+					buffer.WriteString(imp.GetAlias())
 					buffer.WriteString(" ")
 				}
-				buffer.WriteString("\"" + spec.GetPackage() + "\"\n")
-				seen[spec.GetPackage()] = struct{}{}
-
+				buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
+				seen[imp.GetPackage()] = struct{}{}
 			}
 		}
 
-		for _, spec := range packages {
-			if _, found := seen[spec.GetPackage()]; !found && spec.GetPackage() != "" {
+		for _, imp := range packages {
+			if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
 				buffer.WriteString("\t")
-				if spec.GetPackageAlias() != "" {
-					buffer.WriteString(spec.GetPackageAlias())
+				if imp.GetAlias() != "" {
+					buffer.WriteString(imp.GetAlias())
 					buffer.WriteString(" ")
 				}
-				buffer.WriteString("\"" + spec.GetPackage() + "\"\n")
-				seen[spec.GetPackage()] = struct{}{}
+				buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
+				seen[imp.GetPackage()] = struct{}{}
 			}
 		}
 
@@ -66,12 +65,12 @@ func (f *FileSpec) String() string {
 	return buffer.String()
 }
 
-func (f *FileSpec) Packages() []ImportSpec {
-	return []ImportSpec{}
+func (f *FileSpec) Packages() []TypeReference {
+	return []TypeReference{}
 }
 
-func (f *FileSpec) InitializationPackage(spec ImportSpec) *FileSpec {
-	f.InitializationPackages = append(f.InitializationPackages, spec)
+func (f *FileSpec) InitializationPackage(imp Import) *FileSpec {
+	f.InitializationPackages = append(f.InitializationPackages, imp)
 	return f
 }
 

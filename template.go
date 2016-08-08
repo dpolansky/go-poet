@@ -8,7 +8,6 @@ import (
 
 const templatingChar = '$'
 
-// $T.Println($S + "$$asdf")
 func Template(format string, args ...interface{}) string {
 	var buffer bytes.Buffer
 
@@ -46,28 +45,11 @@ func Template(format string, args ...interface{}) string {
 	return buffer.String()
 }
 
-func getQualifiedNameFromArg(obj interface{}) (result string) {
-	importSpec, ok := obj.(ImportSpec)
+func getQualifiedNameFromArg(obj interface{}) string {
+	typeRef, ok := obj.(TypeReference)
 	if !ok {
-		panic(fmt.Sprintf("$T must take an instance of ImportSpec, got type=%T %#v", obj, obj))
+		panic(fmt.Sprintf("$T must implement TypeRefernce, got type=%T %#v", obj, obj))
 	}
 
-	if importSpec.NeedsQualifier() {
-		if importSpec.GetPackageAlias() != "" {
-			result += importSpec.GetPackageAlias()
-		} else {
-			result += importSpec.GetPackage()
-		}
-	}
-
-	if importSpec.GetName() != "" {
-		if importSpec.NeedsQualifier() {
-			result += "."
-		}
-		result += importSpec.GetName()
-	}
-
-	// TODO extend importSpec for * []
-
-	return result
+	return typeRef.GetName()
 }

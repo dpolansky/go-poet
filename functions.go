@@ -3,7 +3,6 @@ package gopoet
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 )
 
 // FuncSpec represents information needed to write a function
@@ -101,23 +100,23 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 	return formatStr.String(), arguments
 }
 
-func (f *FuncSpec) Packages() []ImportSpec {
-	packages := []ImportSpec{}
+func (f *FuncSpec) Packages() []Import {
+	packages := []Import{}
 
 	for _, st := range f.Statements {
 		for _, arg := range st.Arguments {
-			if reflect.TypeOf(arg) == reflect.TypeOf((*ImportSpec)(nil)) {
-				packages = append(packages, arg.(ImportSpec))
+			if asTypeRef, ok := arg.(TypeReference); ok {
+				packages = append(packages, asTypeRef.GetImports()...)
 			}
 		}
 	}
 
 	for _, param := range f.Parameters {
-		packages = append(packages, param.Type)
+		packages = append(packages, param.Type.GetImports()...)
 	}
 
 	for _, param := range f.ResultParameters {
-		packages = append(packages, param.Type)
+		packages = append(packages, param.Type.GetImports()...)
 	}
 
 	return packages
@@ -157,7 +156,7 @@ func (f *FuncSpec) BlockEnd() *FuncSpec {
 }
 
 // Parameter is a convenient method to append a parameter to the function
-func (f *FuncSpec) Parameter(name string, spec ImportSpec) *FuncSpec {
+func (f *FuncSpec) Parameter(name string, spec TypeReference) *FuncSpec {
 	f.Parameters = append(f.Parameters, IdentifierParameter{
 		Identifier{
 			Name: name,
@@ -169,7 +168,7 @@ func (f *FuncSpec) Parameter(name string, spec ImportSpec) *FuncSpec {
 }
 
 // ResultParameter is a convenient method to append a result parameter to the function
-func (f *FuncSpec) ResultParameter(name string, spec ImportSpec) *FuncSpec {
+func (f *FuncSpec) ResultParameter(name string, spec TypeReference) *FuncSpec {
 	f.ResultParameters = append(f.ResultParameters, IdentifierParameter{
 		Identifier{
 			Name: name,

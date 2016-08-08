@@ -5,7 +5,7 @@ type InterfaceSpec struct {
 
 	Name               string
 	Comment            string
-	EmbeddedInterfaces []ImportSpec
+	EmbeddedInterfaces []TypeReference
 	Methods            []FuncSpec
 }
 
@@ -46,14 +46,16 @@ func (i *InterfaceSpec) String() string {
 	return writer.String()
 }
 
-func (i *InterfaceSpec) Packages() []ImportSpec {
-	packages := []ImportSpec{}
+func (i *InterfaceSpec) Packages() []Import {
+	packages := []Import{}
 
 	for _, method := range i.Methods {
 		packages = append(packages, method.Packages()...)
 	}
 
-	packages = append(packages, i.EmbeddedInterfaces...)
+	for _, embedded := range i.EmbeddedInterfaces {
+		packages = append(packages, embedded.GetImports()...)
+	}
 
 	return packages
 }
@@ -63,7 +65,7 @@ func (i *InterfaceSpec) Method(spec FuncSpec) *InterfaceSpec {
 	return i
 }
 
-func (i *InterfaceSpec) EmbedInterface(spec ImportSpec) *InterfaceSpec {
-	i.EmbeddedInterfaces = append(i.EmbeddedInterfaces, spec)
+func (i *InterfaceSpec) EmbedInterface(interfaceType TypeReference) *InterfaceSpec {
+	i.EmbeddedInterfaces = append(i.EmbeddedInterfaces, interfaceType)
 	return i
 }

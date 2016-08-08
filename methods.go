@@ -1,26 +1,19 @@
 package gopoet
 
-import (
-	"bytes"
-	"fmt"
-)
+import "bytes"
 
 type MethodSpec struct {
 	// CodeBlock
 
 	FuncSpec
 	ReceiverName    string
-	Receiver        ImportSpec
+	Receiver        TypeReference
 	IsValueReceiver bool
 }
 
 var _ CodeBlock = (*MethodSpec)(nil)
 
-func NewMethodSpec(name, receiverName string, isValueReceiver bool, receiver ImportSpec) *MethodSpec {
-	if receiver.NeedsQualifier() {
-		panic(fmt.Sprintf("Cannot create method on a struct that needs to be qualified, got %#v", receiver))
-	}
-
+func NewMethodSpec(name, receiverName string, isValueReceiver bool, receiver TypeReference) *MethodSpec {
 	return &MethodSpec{
 		FuncSpec: FuncSpec{
 			Name: name,

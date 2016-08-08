@@ -11,28 +11,18 @@ type blah struct {
 }
 
 func main() {
-	fileSpec := gopoet.NewFileSpec("main")
-	funcSpec := gopoet.NewFuncSpec("blah")
-	funcSpec.Parameter("a", gopoet.ImportFromInstance(&bytes.Buffer{}))
-	NewParameter("a", isPtr)
-	fileSpec.CodeBlock(funcSpec)
-	fmt.Println(fileSpec)
+	gopoet.TypeReferenceFromInstance(fmt.Println)
 }
-
-func mainOld() {
-	fmtImport := gopoet.Import{
+func oldmain() {
+	fmtImport := &gopoet.TypeReferenceSpec{
 		Package: "fmt",
 		Name:    "Println",
 	}
 
+	byteRef := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
 	sampleStruct := gopoet.NewStructSpec("A")
-	blahStruct := gopoet.ImportFromInstance(bytes.Buffer{})
-	typeReference := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
-
-	blahStruct.Unqualified = true
 
 	sampleMethodSpec := gopoet.NewMethodSpec("sampleMethod", "a", false, sampleStruct)
-	blahSpec := gopoet.NewMethodSpec("blahMethod", "b", true, blahStruct)
 
 	sampleStruct.MethodAndAttach("blahMethod", "b", false)
 
@@ -40,6 +30,7 @@ func mainOld() {
 	mainSpec.Statement("$T($S)", fmtImport, "Calling hello...")
 
 	helloSpec := gopoet.NewFuncSpec("hello")
+	helloSpec.Parameter("byteThing", byteRef)
 	helloSpec.BlockStart("for i:= 0; i < 5; i++")
 	helloSpec.Statement("$T($L)", fmtImport, "i")
 	helloSpec.BlockEnd()
@@ -51,7 +42,6 @@ func mainOld() {
 	fileSpec.CodeBlock(mainSpec)
 	fileSpec.CodeBlock(helloSpec)
 	fileSpec.CodeBlock(sampleMethodSpec)
-	fileSpec.CodeBlock(blahSpec)
 
 	fmt.Println(fileSpec.String())
 }

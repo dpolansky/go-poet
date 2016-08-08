@@ -9,7 +9,7 @@ type StructSpec struct {
 	Methods []MethodSpec
 }
 
-var _ ImportSpec = (*StructSpec)(nil)
+var _ TypeReference = (*StructSpec)(nil)
 
 func NewStructSpec(name string) *StructSpec {
 	return &StructSpec{
@@ -17,20 +17,12 @@ func NewStructSpec(name string) *StructSpec {
 	}
 }
 
+func (s *StructSpec) GetImports() []Import {
+	return []Import{}
+}
+
 func (s *StructSpec) GetName() string {
 	return s.Name
-}
-
-func (s *StructSpec) GetPackage() string {
-	return "" // TODO assign created structs to packages
-}
-
-func (s *StructSpec) GetPackageAlias() string {
-	return ""
-}
-
-func (s *StructSpec) NeedsQualifier() bool {
-	return false
 }
 
 func (s *StructSpec) String() string {
@@ -63,8 +55,8 @@ func (s *StructSpec) String() string {
 	return writer.String()
 }
 
-func (s *StructSpec) Packages() []ImportSpec {
-	packages := []ImportSpec{}
+func (s *StructSpec) Packages() []TypeReference {
+	packages := []TypeReference{}
 
 	for _, field := range s.Fields {
 		packages = append(packages, field.Type)
@@ -78,20 +70,20 @@ func (s *StructSpec) StructComment(comment string) *StructSpec {
 	return s
 }
 
-func (s *StructSpec) Field(name string, spec ImportSpec) *StructSpec {
+func (s *StructSpec) Field(name string, typeRef TypeReference) *StructSpec {
 	s.Fields = append(s.Fields, IdentifierField{
 		Identifier: Identifier{
-			Type: spec,
+			Type: typeRef,
 			Name: name,
 		},
 	})
 	return s
 }
 
-func (s *StructSpec) FieldWithTag(name string, spec ImportSpec, tag string) *StructSpec {
+func (s *StructSpec) FieldWithTag(name string, typeRef TypeReference, tag string) *StructSpec {
 	s.Fields = append(s.Fields, IdentifierField{
 		Identifier: Identifier{
-			Type: spec,
+			Type: typeRef,
 			Name: name,
 		},
 		Tag: tag,

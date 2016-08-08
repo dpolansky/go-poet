@@ -2,7 +2,7 @@ package gopoet
 
 type CodeBlock interface {
 	String() string
-	Packages() []ImportSpec
+	Packages() []Import
 }
 
 type Identifier struct {
@@ -19,17 +19,12 @@ type IdentifierField struct {
 	Tag string
 }
 
-type ImportSpec interface {
+type Import interface {
 	GetPackage() string
-	GetPackageAlias() string
-	NeedsQualifier() bool
-	GetName() string
+	GetAlias() string
 }
 
 type TypeReference interface {
-	ImportSpec
-}
-
-type TypeReferenceSpec struct {
-	Import
+	GetImports() []Import
+	GetName() string
 }

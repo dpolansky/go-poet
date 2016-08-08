@@ -67,6 +67,10 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 
 	for i, param := range f.Parameters {
 		formatStr.WriteString("$L $T")
+		if param.Variadic {
+			formatStr.WriteString("...")
+		}
+
 		arguments = append(arguments, param.Name, param.Type)
 
 		if i != len(f.Parameters)-1 {
@@ -158,7 +162,7 @@ func (f *FuncSpec) BlockEnd() *FuncSpec {
 // Parameter is a convenient method to append a parameter to the function
 func (f *FuncSpec) Parameter(name string, spec TypeReference) *FuncSpec {
 	f.Parameters = append(f.Parameters, IdentifierParameter{
-		Identifier{
+		Identifier: Identifier{
 			Name: name,
 			Type: spec,
 		},
@@ -167,10 +171,23 @@ func (f *FuncSpec) Parameter(name string, spec TypeReference) *FuncSpec {
 	return f
 }
 
+// Parameter is a convenient method to append a parameter to the function
+func (f *FuncSpec) VariadicParameter(name string, spec TypeReference) *FuncSpec {
+	f.Parameters = append(f.Parameters, IdentifierParameter{
+		Identifier: Identifier{
+			Name: name,
+			Type: spec,
+		},
+		Variadic: true,
+	})
+
+	return f
+}
+
 // ResultParameter is a convenient method to append a result parameter to the function
 func (f *FuncSpec) ResultParameter(name string, spec TypeReference) *FuncSpec {
 	f.ResultParameters = append(f.ResultParameters, IdentifierParameter{
-		Identifier{
+		Identifier: Identifier{
 			Name: name,
 			Type: spec,
 		},

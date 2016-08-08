@@ -12,6 +12,7 @@ type Identifier struct {
 
 type IdentifierParameter struct {
 	Identifier
+	Variadic bool
 }
 
 type IdentifierField struct {

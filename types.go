@@ -10,71 +10,6 @@ import (
 
 const UnqualifiedPrefix = "_unqualified"
 
-type ImportSpec struct {
-	Package   string
-	Alias     string
-	Qualified bool
-}
-
-func (i *ImportSpec) GetQualifier() string {
-	if i == nil {
-		return ""
-	}
-
-	result := bytes.Buffer{}
-
-	if i.Qualified {
-		if i.Alias != "" {
-			result.WriteString(i.Alias)
-		} else {
-			result.WriteString(i.Package)
-		}
-		result.WriteString(".")
-	}
-
-	return result.String()
-}
-
-var _ Import = (*ImportSpec)(nil)
-
-func (i *ImportSpec) GetAlias() string {
-	return i.Alias
-}
-
-func (i *ImportSpec) GetPackage() string {
-	return i.Package
-}
-
-type TypeReferenceMap struct {
-	KeyType   TypeReference
-	ValueType TypeReference
-	prefix    string
-}
-
-var _ TypeReference = (*TypeReferenceMap)(nil)
-
-func newTypeReferenceFromMap(t interface{}, prefix string) TypeReference {
-	refType := reflect.TypeOf(t)
-
-	return &TypeReferenceMap{
-		KeyType:   newTypeReferenceFromInstance(reflect.New(refType.Key()).Elem().Interface()),
-		ValueType: newTypeReferenceFromInstance(reflect.New(refType.Elem()).Elem().Interface()),
-		prefix:    prefix,
-	}
-}
-
-func (t *TypeReferenceMap) GetImports() []Import {
-	imports := []Import{}
-
-	imports = append(imports, t.KeyType.GetImports()...)
-	imports = append(imports, t.ValueType.GetImports()...)
-	return imports
-}
-
-func (t *TypeReferenceMap) GetName() string {
-	return fmt.Sprintf("%smap[%s]%s", t.prefix, t.KeyType.GetName(), t.ValueType.GetName())
-}
-
 // TypeReferenceFromInstance creates an TypeReference from an existing type
 func TypeReferenceFromInstance(t interface{}) TypeReference {
 	return newTypeReferenceFromInstance(t)
@@ -110,6 +45,36 @@ func newTypeReferenceFromInstance(t interface{}) TypeReference {
 	}
 
 	return newTypeReferenceFromValue(t)
+}
+
+type TypeReferenceMap struct {
+	KeyType   TypeReference
+	ValueType TypeReference
+	prefix    string
+}
+
+var _ TypeReference = (*TypeReferenceMap)(nil)
+
+func newTypeReferenceFromMap(t interface{}, prefix string) TypeReference {
+	refType := reflect.TypeOf(t)
+
+	return &TypeReferenceMap{
+		KeyType:   newTypeReferenceFromInstance(reflect.New(refType.Key()).Elem().Interface()),
+		ValueType: newTypeReferenceFromInstance(reflect.New(refType.Elem()).Elem().Interface()),
+		prefix:    prefix,
+	}
+}
+
+func (t *TypeReferenceMap) GetImports() []Import {
+	imports := []Import{}
+
+	imports = append(imports, t.KeyType.GetImports()...)
+	imports = append(imports, t.ValueType.GetImports()...)
+	return imports
+}
+
+func (t *TypeReferenceMap) GetName() string {
+	return fmt.Sprintf("%smap[%s]%s", t.prefix, t.KeyType.GetName(), t.ValueType.GetName())
 }
 
 type TypeReferenceValue struct {

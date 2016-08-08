@@ -50,7 +50,7 @@ func (i *InterfaceSpec) Packages() []Import {
 	packages := []Import{}
 
 	for _, method := range i.Methods {
-		packages = append(packages, method.Packages()...)
+		packages = append(packages, method.GetImports()...)
 	}
 
 	for _, embedded := range i.EmbeddedInterfaces {

@@ -100,7 +100,7 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 	return formatStr.String(), arguments
 }
 
-func (f *FuncSpec) Packages() []Import {
+func (f *FuncSpec) GetImports() []Import {
 	packages := []Import{}
 
 	for _, st := range f.Statements {

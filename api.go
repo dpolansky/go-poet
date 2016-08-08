@@ -2,7 +2,7 @@ package gopoet
 
 type CodeBlock interface {
 	String() string
-	Packages() []Import
+	GetImports() []Import
 }
 
 type Identifier struct {

@@ -11,19 +11,11 @@ type blah struct {
 }
 
 func main() {
-	gopoet.TypeReferenceFromInstance(fmt.Println)
-}
-func oldmain() {
-	fmtImport := &gopoet.TypeReferenceSpec{
-		Package: "fmt",
-		Name:    "Println",
-	}
-
+	fmtImport := gopoet.TypeReferenceFromInstance(fmt.Println)
 	byteRef := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
+
 	sampleStruct := gopoet.NewStructSpec("A")
-
 	sampleMethodSpec := gopoet.NewMethodSpec("sampleMethod", "a", false, sampleStruct)
-
 	sampleStruct.MethodAndAttach("blahMethod", "b", false)
 
 	mainSpec := gopoet.NewFuncSpec("main")

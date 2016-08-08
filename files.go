@@ -24,7 +24,7 @@ func (f *FileSpec) String() string {
 
 	var packages []Import
 	for _, blk := range f.CodeBlocks {
-		packages = append(packages, blk.Packages()...)
+		packages = append(packages, blk.GetImports()...)
 	}
 
 	if len(f.InitializationPackages) > 0 || len(packages) > 0 {

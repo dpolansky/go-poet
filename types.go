@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+const UnqualifiedPrefix = "_unqualified"
+
 type ImportSpec struct {
 	Package   string
 	Alias     string
@@ -122,34 +124,45 @@ func newTypeReferenceFromValue(t interface{}) TypeReference {
 	refType := reflect.TypeOf(t)
 	result := &TypeReferenceValue{}
 
-	if refType.Kind() == reflect.Ptr {
-		refType = refType.Elem()
-		// interfaces are already pointers, so don't need to add prefix
-		if refType.Kind() != reflect.Interface {
-			result.prefix += "*"
-		}
-	}
-
-	if refType.Kind() == reflect.Slice || refType.Kind() == reflect.Array {
-		result.prefix += "[]"
-		refType = refType.Elem()
-	}
+	result.prefix, refType = dereferenceType("", refType)
 
 	switch refType.Kind() {
 	case reflect.Interface:
 		fallthrough
 	case reflect.Struct:
 		result.Import = &ImportSpec{
-			Qualified: true,
+			Qualified: !strings.HasPrefix(refType.Name(), UnqualifiedPrefix),
 			Package:   refType.PkgPath(),
 		}
-		break
 	case reflect.Map:
 		return newTypeReferenceFromMap(reflect.New(refType).Elem().Interface(), result.prefix)
 	}
 
-	result.Name = refType.Name()
+	result.Name = strings.TrimPrefix(refType.Name(), UnqualifiedPrefix)
+
 	return result
+}
+
+func dereferenceType(prefix string, refType reflect.Type) (string, reflect.Type) {
+	for {
+		if refType.Kind() == reflect.Ptr {
+			refType = refType.Elem()
+			// interfaces are already pointers, so don't need to add prefix
+			if refType.Kind() != reflect.Interface {
+				prefix += "*"
+			}
+		} else if refType.Kind() == reflect.Slice || refType.Kind() == reflect.Array {
+			prefix += "[]"
+			refType = refType.Elem()
+		} else if refType.Kind() == reflect.Chan {
+			prefix += refType.ChanDir().String() + " "
+			refType = refType.Elem()
+		} else {
+			break
+		}
+	}
+
+	return prefix, refType
 }
 
 func (t *TypeReferenceValue) GetImports() []Import {

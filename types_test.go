@@ -64,6 +64,15 @@ func (s *TypeSuite) TestMapPointer(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (s *TypeSuite) TestMapPointerPointer(c *C) {
+	expected := "**map[string]string"
+	m := &map[string]string{}
+	typeRef := TypeReferenceFromInstance(&m)
+	actual := typeRef.GetName()
+
+	c.Assert(actual, Equals, expected)
+}
+
 func (s *TypeSuite) TestPrimitive(c *C) {
 	expected := "int"
 	typeRef := TypeReferenceFromInstance(1)
@@ -99,6 +108,31 @@ func (s *TypeSuite) TestArray(c *C) {
 func (s *TypeSuite) TestInterface(c *C) {
 	expected := "os.Signal"
 	typeRef := TypeReferenceFromInstance((*os.Signal)(nil))
+	actual := typeRef.GetName()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *TypeSuite) TestUnqualified(c *C) {
+	type _unqualifiedBuffer bytes.Buffer
+	expected := "Buffer"
+	typeRef := TypeReferenceFromInstance(_unqualifiedBuffer{})
+	actual := typeRef.GetName()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *TypeSuite) TestChannel(c *C) {
+	expected := "chan *bytes.Buffer"
+	typeRef := TypeReferenceFromInstance(make(chan *bytes.Buffer))
+	actual := typeRef.GetName()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *TypeSuite) TestChannelOneDirection(c *C) {
+	expected := "chan<- *bytes.Buffer"
+	typeRef := TypeReferenceFromInstance(make(chan<- *bytes.Buffer))
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)

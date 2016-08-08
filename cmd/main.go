@@ -11,6 +11,11 @@ type blah struct {
 }
 
 func main() {
+	typeRef := gopoet.TypeReferenceFromInstance(make(chan<- *bytes.Buffer))
+	fmt.Println(typeRef.GetName())
+}
+
+func oldmain() {
 	fmtImport := gopoet.TypeReferenceFromInstance(fmt.Println)
 	byteRef := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
 

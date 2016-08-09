@@ -27,6 +27,10 @@ func NewFuncSpec(name string) *FuncSpec {
 func (f *FuncSpec) String() string {
 	writer := NewCodeWriter()
 
+	if f.Comment != "" {
+		writer.WriteCode("// " + f.Comment + "\n")
+	}
+
 	writer.WriteStatement(f.createSignature())
 
 	for _, st := range f.Statements {
@@ -78,7 +82,7 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 	formatStr.WriteString(")")
 
 	if len(f.ResultParameters) == 1 && f.ResultParameters[0].Name == "" {
-		formatStr.WriteString("$T")
+		formatStr.WriteString(" $T")
 		arguments = append(arguments, f.ResultParameters[0].Type)
 	} else if len(f.ResultParameters) >= 1 {
 

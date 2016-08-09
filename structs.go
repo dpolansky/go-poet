@@ -91,12 +91,12 @@ func (s *StructSpec) FieldWithTag(name string, typeRef TypeReference, tag string
 	return s
 }
 
-func (s *StructSpec) Method(name, receiverName string, isValueReceiver bool) *MethodSpec {
-	return NewMethodSpec(name, receiverName, isValueReceiver, s)
+func (s *StructSpec) Method(name, receiverName string) *MethodSpec {
+	return NewMethodSpec(name, receiverName, s)
 }
 
-func (s *StructSpec) MethodAndAttach(name, receiverName string, isValueReceiver bool) *MethodSpec {
-	method := NewMethodSpec(name, receiverName, isValueReceiver, s)
+func (s *StructSpec) MethodAndAttach(name, receiverName string) *MethodSpec {
+	method := NewMethodSpec(name, receiverName, s)
 	s.Methods = append(s.Methods, *method)
 	return method
 }

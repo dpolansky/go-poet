@@ -1,9 +1,6 @@
 package gopoet
 
-import (
-	"bytes"
-	"fmt"
-)
+import "bytes"
 
 // FuncSpec represents information needed to write a function
 type FuncSpec struct {
@@ -87,12 +84,13 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 
 		formatStr.WriteString(" (")
 		for i, resultParameter := range f.ResultParameters {
-			if resultParameter.Name == "" {
-				panic(fmt.Sprintf("Result parameters need a name when there is more than one (got %v)", resultParameter))
+			if resultParameter.Name != "" {
+				formatStr.WriteString("$L ")
+				arguments = append(arguments, resultParameter.Name)
 			}
 
-			formatStr.WriteString("$L $T")
-			arguments = append(arguments, resultParameter.Name, resultParameter.Type)
+			formatStr.WriteString("$T")
+			arguments = append(arguments, resultParameter.Type)
 
 			if i != len(f.ResultParameters)-1 {
 				formatStr.WriteString(", ")

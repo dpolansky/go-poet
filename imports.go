@@ -30,9 +30,17 @@ func (i *ImportSpec) GetQualifier() string {
 var _ Import = (*ImportSpec)(nil)
 
 func (i *ImportSpec) GetAlias() string {
+	if i == nil {
+		return ""
+	}
+
 	return i.Alias
 }
 
 func (i *ImportSpec) GetPackage() string {
+	if i == nil {
+		return ""
+	}
+
 	return i.Package
 }

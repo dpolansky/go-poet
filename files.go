@@ -83,3 +83,37 @@ func (f *FileSpec) InitFunction(blk CodeBlock) *FileSpec {
 	f.Init = blk
 	return f
 }
+
+func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
+	v := &Variable{
+		Identifier: Identifier{
+			Name: name,
+			Type: typ,
+		},
+		Constant: false,
+		Format:   format,
+		Args:     args,
+	}
+	f.CodeBlocks = append(f.CodeBlocks, v)
+	return f
+}
+
+func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
+	v := &Variable{
+		Identifier: Identifier{
+			Name: name,
+			Type: typ,
+		},
+		Constant: true,
+		Format:   format,
+		Args:     args,
+	}
+	f.CodeBlocks = append(f.CodeBlocks, v)
+	return f
+}
+
+func (f *FileSpec) VariableGrouping() *VariableGrouping {
+	v := &VariableGrouping{}
+	f.CodeBlocks = append(f.CodeBlocks, v)
+	return v
+}

@@ -11,11 +11,6 @@ type blah struct {
 }
 
 func main() {
-	typeRef := gopoet.TypeReferenceFromInstance(make(chan<- *bytes.Buffer))
-	fmt.Println(typeRef.GetName())
-}
-
-func oldmain() {
 	fmtImport := gopoet.TypeReferenceFromInstance(fmt.Println)
 	byteRef := gopoet.TypeReferenceFromInstance(&bytes.Buffer{})
 
@@ -23,7 +18,7 @@ func oldmain() {
 	sampleMethodSpec := gopoet.NewMethodSpec("sampleMethod", "a", false, sampleStruct)
 	sampleStruct.MethodAndAttach("blahMethod", "b", false)
 
-	mainSpec := gopoet.NewFuncSpec("main")
+	mainSpec := gopoet.NewFuncSpec("mainDemo")
 	mainSpec.Statement("$T($S)", fmtImport, "Calling hello...")
 
 	helloSpec := gopoet.NewFuncSpec("hello")
@@ -39,6 +34,10 @@ func oldmain() {
 	fileSpec.CodeBlock(mainSpec)
 	fileSpec.CodeBlock(helloSpec)
 	fileSpec.CodeBlock(sampleMethodSpec)
+
+	varGroup := fileSpec.VariableGrouping()
+	varGroup.Constant("aah", byteRef, "$L", 1)
+	varGroup.Variable("haa", gopoet.TypeReferenceFromInstance(""), "$S", "test")
 
 	fmt.Println(fileSpec.String())
 }

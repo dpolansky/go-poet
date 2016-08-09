@@ -41,3 +41,23 @@ func (s *TemplateSuite) TestTemplatePanicsWithNotEnoughArgs(c *C) {
 	Template("$T()")
 	c.Fail()
 }
+
+func (s *TemplateSuite) TestTemplatePanicsWithNonTypeReference(c *C) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
+	Template("$T()", 1)
+	c.Fail()
+}
+
+func (s *TemplateSuite) TestTemplatePanicsWithInvalidTemplatingString(c *C) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
+	Template("$D()", TypeReferenceFromInstance(fmt.Println))
+	c.Fail()
+}

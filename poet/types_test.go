@@ -70,6 +70,20 @@ func (s *TypeSuite) TestMapPointerPointer(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (s *TypeSuite) TestMapImports(c *C) {
+	expected := []Import{
+		(*ImportSpec)(nil),
+		&ImportSpec{
+			Package:   "bytes",
+			Qualified: true,
+		},
+	}
+	typeRef := TypeReferenceFromInstance(map[string]*bytes.Buffer{})
+	actual := typeRef.GetImports()
+
+	c.Assert(actual, DeepEquals, expected)
+}
+
 func (s *TypeSuite) TestPrimitive(c *C) {
 	expected := "int"
 	typeRef := TypeReferenceFromInstance(1)
@@ -133,4 +147,14 @@ func (s *TypeSuite) TestChannelOneDirection(c *C) {
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)
+}
+
+func (s *TypeSuite) TestTypeReferencePanicsWithNilInstance(c *C) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
+	TypeReferenceFromInstance(nil)
+	c.Fail()
 }

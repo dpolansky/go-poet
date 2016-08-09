@@ -159,10 +159,6 @@ func newTypeReferenceFromFunction(t interface{}, alias string) TypeReference {
 	funcPtr := runtime.FuncForPC(reflect.ValueOf(t).Pointer())
 	fullyQualifiedPieces := strings.Split(funcPtr.Name(), ".")
 
-	if len(fullyQualifiedPieces) < 2 {
-		panic(fmt.Sprintf("Could not create type reference from function, %#v", t))
-	}
-
 	return &TypeReferenceFunc{
 		Import: &ImportSpec{
 			Qualified: true,

@@ -90,6 +90,51 @@ func (f *VariablesSuite) TestConstantGrouping(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (f *VariablesSuite) TestGroupingWithAttachedConstants(c *C) {
+	expected := "const (\n" +
+		"\tc int = 1\n" +
+		"\td int = 1\n" +
+		")\n"
+
+	variableGrouping := &VariableGrouping{}
+	variableGrouping.Constant("c", TypeReferenceFromInstance(1), "$L", 1)
+	variableGrouping.Constant("d", TypeReferenceFromInstance(1), "$L", 1)
+
+	actual := variableGrouping.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *VariablesSuite) TestGroupingWithAttachedVariables(c *C) {
+	expected := "var (\n" +
+		"\tc int = 1\n" +
+		"\td int = 1\n" +
+		")\n"
+
+	variableGrouping := &VariableGrouping{}
+	variableGrouping.Variable("c", TypeReferenceFromInstance(1), "$L", 1)
+	variableGrouping.Variable("d", TypeReferenceFromInstance(1), "$L", 1)
+
+	actual := variableGrouping.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *VariablesSuite) TestGroupingWithAttachedMixed(c *C) {
+	expected := "const (\n" +
+		"\tc int = 1\n" +
+		")\n" +
+		"\n" +
+		"var (\n" +
+		"\td int = 1\n" +
+		")\n"
+
+	variableGrouping := &VariableGrouping{}
+	variableGrouping.Constant("c", TypeReferenceFromInstance(1), "$L", 1)
+	variableGrouping.Variable("d", TypeReferenceFromInstance(1), "$L", 1)
+
+	actual := variableGrouping.String()
+	c.Assert(actual, Equals, expected)
+}
+
 func (f *VariablesSuite) TestConstantGroupingMixed(c *C) {
 	expected := "const (\n" +
 		"\tc int = 1\n" +

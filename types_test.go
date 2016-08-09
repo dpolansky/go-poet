@@ -5,12 +5,9 @@ import (
 	"fmt"
 	IoAlias "io"
 	"os"
-	"testing"
 
 	. "gopkg.in/check.v1"
 )
-
-func TestTypes(t *testing.T) { TestingT(t) }
 
 type TypeSuite struct{}
 

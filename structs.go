@@ -18,7 +18,13 @@ func NewStructSpec(name string) *StructSpec {
 }
 
 func (s *StructSpec) GetImports() []Import {
-	return []Import{}
+	imports := []Import{}
+
+	for _, f := range s.Fields {
+		imports = append(imports, f.Type.GetImports()...)
+	}
+
+	return imports
 }
 
 func (s *StructSpec) GetName() string {

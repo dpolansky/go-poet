@@ -2,13 +2,9 @@ package gopoet
 
 import (
 	"bytes"
-	"testing"
 
 	. "gopkg.in/check.v1"
 )
-
-// Hook up gocheck into the "go test" runner.
-func TestMethods(t *testing.T) { TestingT(t) }
 
 type MethodSuite struct{}
 

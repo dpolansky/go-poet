@@ -1,4 +1,4 @@
-package gopoet
+package poet
 
 import (
 	"fmt"

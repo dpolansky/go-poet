@@ -1,4 +1,4 @@
-package gopoet
+package poet
 
 // InterfaceSpec represents an interface
 type InterfaceSpec struct {

@@ -4,8 +4,6 @@ import "bytes"
 
 // FuncSpec represents information needed to write a function
 type FuncSpec struct {
-	// CodeBlock
-
 	Name             string
 	Comment          string
 	Parameters       []IdentifierParameter
@@ -15,6 +13,7 @@ type FuncSpec struct {
 
 var _ CodeBlock = (*FuncSpec)(nil)
 
+// NewFuncSpec returns a FuncSpec with the given name
 func NewFuncSpec(name string) *FuncSpec {
 	return &FuncSpec{
 		Name:             name,
@@ -24,6 +23,7 @@ func NewFuncSpec(name string) *FuncSpec {
 	}
 }
 
+// String returns a string representation of the function
 func (f *FuncSpec) String() string {
 	writer := NewCodeWriter()
 
@@ -45,6 +45,8 @@ func (f *FuncSpec) String() string {
 	return writer.String()
 }
 
+// createSignature generates the function's signature as a statement, starting from "func" and ending with
+// the opening curly brace.
 func (f *FuncSpec) createSignature() Statement {
 	formatStr := bytes.Buffer{}
 	signature, args := f.Signature()
@@ -60,6 +62,8 @@ func (f *FuncSpec) createSignature() Statement {
 	}
 }
 
+// Signature returns a format string and slice of arguments for the function's signature, not
+// including the starting "func" or opening curly brace
 func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 	formatStr := bytes.Buffer{}
 
@@ -106,6 +110,8 @@ func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
 	return formatStr.String(), arguments
 }
 
+// GetImports returns a slice of imports that this function needs, including
+// parameters, result parameters, and statements within the function
 func (f *FuncSpec) GetImports() []Import {
 	packages := []Import{}
 
@@ -173,7 +179,7 @@ func (f *FuncSpec) Parameter(name string, spec TypeReference) *FuncSpec {
 	return f
 }
 
-// Parameter is a convenient method to append a parameter to the function
+// VariadicParameter is a convenient method to append a parameter to the function
 func (f *FuncSpec) VariadicParameter(name string, spec TypeReference) *FuncSpec {
 	f.Parameters = append(f.Parameters, IdentifierParameter{
 		Identifier: Identifier{

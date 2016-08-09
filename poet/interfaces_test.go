@@ -1,6 +1,10 @@
 package poet
 
-import . "gopkg.in/check.v1"
+import (
+	"io"
+
+	. "gopkg.in/check.v1"
+)
 
 type InterfaceSuite struct{}
 
@@ -43,4 +47,50 @@ func (f *InterfaceSuite) TestInterfaceWithMethods(c *C) {
 
 	actual := i.String()
 	c.Assert(actual, Equals, expected)
+}
+
+func (f *InterfaceSuite) TestInterfaceEmbeddedInterface(c *C) {
+	expected := "type NewInterface interface {\n" +
+		"\tio.Writer\n" +
+		"}\n"
+
+	i := NewInterfaceSpec("NewInterface").EmbedInterface(TypeReferenceFromInstance((*io.Writer)(nil)))
+
+	actual := i.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *InterfaceSuite) TestInterfaceImportsFromEmbeddedInterfaces(c *C) {
+	expected := []Import{
+		&ImportSpec{
+			Package:   "io",
+			Qualified: true,
+		},
+	}
+
+	i := NewInterfaceSpec("NewInterface").EmbedInterface(TypeReferenceFromInstance((*io.Writer)(nil)))
+
+	actual := i.GetImports()
+	c.Assert(actual, DeepEquals, expected)
+}
+
+func (f *InterfaceSuite) TestInterfaceImportsFromMethods(c *C) {
+	expected := []Import{
+		&ImportSpec{
+			Package:   "io",
+			Qualified: true,
+		},
+	}
+
+	i := NewInterfaceSpec("NewInterface")
+	i.
+		Method(
+			NewFuncSpec("TestA").
+				FunctionComment("TestA does stuff").
+				Parameter("paramA", TypeReferenceFromInstance((*io.Writer)(nil))),
+		).
+		Method(NewFuncSpec("TestB"))
+
+	actual := i.GetImports()
+	c.Assert(actual, DeepEquals, expected)
 }

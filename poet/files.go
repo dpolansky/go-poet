@@ -5,7 +5,8 @@ import (
 	"fmt"
 )
 
-// FileSpec represents the necessary components to generate a go file
+// FileSpec represents a .go source file
+>>>>>>> c66c5eb96c7d49ed805a884f436dfcbe53940869
 type FileSpec struct {
 	Package                string      // Package that the file belongs to
 	InitializationPackages []Import    // InitializationPackages include any imports that need to be included for their side effects
@@ -95,7 +96,7 @@ func (f *FileSpec) InitializationPackage(imp Import) *FileSpec {
 	return f
 }
 
-// CodeBlock appends a CodeBlock
+// CodeBlock adds a code block to the file
 func (f *FileSpec) CodeBlock(blk CodeBlock) *FileSpec {
 	f.CodeBlocks = append(f.CodeBlocks, blk)
 	return f
@@ -107,7 +108,8 @@ func (f *FileSpec) InitFunction(blk *FuncSpec) *FileSpec {
 	return f
 }
 
-// GlobalVariable produces a global variable
+// GlobalVariable adds a global variable to the file with the given name, type reference, format string
+// for the value of the variable, and arguments for the format string.
 func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
 	v := &Variable{
 		Identifier: Identifier{
@@ -122,7 +124,8 @@ func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string,
 	return f
 }
 
-// GlobalConstant produces a global constant
+// GlobalConstant adds a global constant to the file with the given name, type reference, format string
+// for the value of the constant, and arguments for the format string.
 func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
 	v := &Variable{
 		Identifier: Identifier{
@@ -137,7 +140,8 @@ func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string,
 	return f
 }
 
-// VariableGrouping creates a VariableGrouping and returns it
+// VariableGrouping adds a variable grouping to the file, which can have variables appended to it
+// that will be formatted in groups of variables and constants.
 func (f *FileSpec) VariableGrouping() *VariableGrouping {
 	v := &VariableGrouping{}
 	f.CodeBlocks = append(f.CodeBlocks, v)

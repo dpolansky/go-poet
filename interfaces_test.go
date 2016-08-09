@@ -27,6 +27,7 @@ func (f *InterfaceSuite) TestBlankInterfaceWithComment(c *C) {
 
 func (f *InterfaceSuite) TestInterfaceWithMethods(c *C) {
 	expected := "type NewInterface interface {\n" +
+		"\t// TestA does stuff\n" +
 		"\tTestA(paramA string)\n" +
 		"\tTestB()\n" +
 		"}\n"

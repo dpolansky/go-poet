@@ -69,6 +69,12 @@ func (i *InterfaceSpec) String() string {
 	}
 
 	for _, method := range i.Methods {
+		if method.Comment != "" {
+			writer.WriteStatement(Statement{
+				Format:    "// $L",
+				Arguments: []interface{}{method.Comment},
+			})
+		}
 		signature, args := method.Signature()
 		writer.WriteStatement(Statement{
 			Format:    signature,

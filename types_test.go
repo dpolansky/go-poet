@@ -91,7 +91,7 @@ func (s *TypeSuite) TestBoolean(c *C) {
 
 func (s *TypeSuite) TestByte(c *C) {
 	expected := "byte"
-	typeRef := TypeReferenceFromInstanceWithAlias(byte('A'), "byte")
+	typeRef := TypeReferenceFromInstanceWithCustomName(byte('A'), "byte")
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)

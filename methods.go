@@ -6,21 +6,19 @@ type MethodSpec struct {
 	// CodeBlock
 
 	FuncSpec
-	ReceiverName    string
-	Receiver        TypeReference
-	IsValueReceiver bool
+	ReceiverName string
+	Receiver     TypeReference
 }
 
 var _ CodeBlock = (*MethodSpec)(nil)
 
-func NewMethodSpec(name, receiverName string, isValueReceiver bool, receiver TypeReference) *MethodSpec {
+func NewMethodSpec(name, receiverName string, receiver TypeReference) *MethodSpec {
 	return &MethodSpec{
 		FuncSpec: FuncSpec{
 			Name: name,
 		},
-		ReceiverName:    receiverName,
-		IsValueReceiver: isValueReceiver,
-		Receiver:        receiver,
+		ReceiverName: receiverName,
+		Receiver:     receiver,
 	}
 }
 
@@ -49,9 +47,6 @@ func (m *MethodSpec) createSignature() Statement {
 	formatStr.WriteString("(")
 	formatStr.WriteString(m.ReceiverName)
 	formatStr.WriteString(" ")
-	if !m.IsValueReceiver {
-		formatStr.WriteString("*")
-	}
 	formatStr.WriteString(m.Receiver.GetName())
 	formatStr.WriteString(") ")
 	formatStr.WriteString(signature)

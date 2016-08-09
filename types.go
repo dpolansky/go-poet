@@ -12,39 +12,42 @@ const UnqualifiedPrefix = "_unqualified"
 
 // TypeReferenceFromInstance creates an TypeReference from an existing type
 func TypeReferenceFromInstance(t interface{}) TypeReference {
-	return newTypeReferenceFromInstance(t)
+	return newTypeReferenceFromInstance(t, "")
 }
 
-// TypeReferenceFromInstance creates an TypeReference from an existing type
 func TypeReferenceFromInstanceWithAlias(t interface{}, alias string) TypeReference {
-	typeRef := &typeReferenceWithAlias{
-		TypeReference: newTypeReferenceFromInstance(t),
-		alias:         alias,
+	return newTypeReferenceFromInstance(t, alias)
+}
+
+func TypeReferenceFromInstanceWithCustomName(t interface{}, name string) TypeReference {
+	typeRef := &typeReferenceWithCustomName{
+		TypeReference: newTypeReferenceFromInstance(t, ""),
+		name:          name,
 	}
 
 	return typeRef
 }
 
-type typeReferenceWithAlias struct {
+type typeReferenceWithCustomName struct {
 	TypeReference
-	alias string
+	name string
 }
 
-func (t *typeReferenceWithAlias) GetName() string {
-	return t.alias
+func (t *typeReferenceWithCustomName) GetName() string {
+	return t.name
 }
 
-func newTypeReferenceFromInstance(t interface{}) TypeReference {
+func newTypeReferenceFromInstance(t interface{}, alias string) TypeReference {
 	reflectType := reflect.TypeOf(t)
 	if reflectType == nil {
 		panic("Invalid nil instance without associated type")
 	}
 
 	if reflectType.Kind() == reflect.Func {
-		return newTypeReferenceFromFunction(t)
+		return newTypeReferenceFromFunction(t, alias)
 	}
 
-	return newTypeReferenceFromValue(t)
+	return newTypeReferenceFromValue(t, alias)
 }
 
 type TypeReferenceMap struct {
@@ -59,8 +62,8 @@ func newTypeReferenceFromMap(t interface{}, prefix string) TypeReference {
 	refType := reflect.TypeOf(t)
 
 	return &TypeReferenceMap{
-		KeyType:   newTypeReferenceFromInstance(reflect.New(refType.Key()).Elem().Interface()),
-		ValueType: newTypeReferenceFromInstance(reflect.New(refType.Elem()).Elem().Interface()),
+		KeyType:   newTypeReferenceFromInstance(reflect.New(refType.Key()).Elem().Interface(), ""),
+		ValueType: newTypeReferenceFromInstance(reflect.New(refType.Elem()).Elem().Interface(), ""),
 		prefix:    prefix,
 	}
 }
@@ -85,7 +88,7 @@ type TypeReferenceValue struct {
 
 var _ TypeReference = (*TypeReferenceValue)(nil)
 
-func newTypeReferenceFromValue(t interface{}) TypeReference {
+func newTypeReferenceFromValue(t interface{}, alias string) TypeReference {
 	refType := reflect.TypeOf(t)
 	result := &TypeReferenceValue{}
 
@@ -98,6 +101,7 @@ func newTypeReferenceFromValue(t interface{}) TypeReference {
 		result.Import = &ImportSpec{
 			Qualified: !strings.HasPrefix(refType.Name(), UnqualifiedPrefix),
 			Package:   refType.PkgPath(),
+			Alias:     alias,
 		}
 	case reflect.Map:
 		return newTypeReferenceFromMap(reflect.New(refType).Elem().Interface(), result.prefix)
@@ -151,7 +155,7 @@ type TypeReferenceFunc struct {
 
 var _ TypeReference = (*TypeReferenceFunc)(nil)
 
-func newTypeReferenceFromFunction(t interface{}) TypeReference {
+func newTypeReferenceFromFunction(t interface{}, alias string) TypeReference {
 	funcPtr := runtime.FuncForPC(reflect.ValueOf(t).Pointer())
 	fullyQualifiedPieces := strings.Split(funcPtr.Name(), ".")
 
@@ -163,6 +167,7 @@ func newTypeReferenceFromFunction(t interface{}) TypeReference {
 		Import: &ImportSpec{
 			Qualified: true,
 			Package:   fullyQualifiedPieces[0],
+			Alias:     alias,
 		},
 		Name: fullyQualifiedPieces[1],
 	}

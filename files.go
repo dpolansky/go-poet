@@ -19,6 +19,8 @@ func NewFileSpec(pkg string) *FileSpec {
 
 func (f *FileSpec) String() string {
 	var buffer bytes.Buffer
+	didStartImportBlock := false
+
 	buffer.WriteString("package " + f.Package + "\n\n")
 	seen := map[string]struct{}{}
 
@@ -27,34 +29,42 @@ func (f *FileSpec) String() string {
 		packages = append(packages, blk.GetImports()...)
 	}
 
-	if len(f.InitializationPackages) > 0 || len(packages) > 0 {
-		buffer.WriteString("import (\n")
-
-		for _, imp := range f.InitializationPackages {
-			if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
-				buffer.WriteString("\t")
-				if imp.GetAlias() != "" {
-					buffer.WriteString(imp.GetAlias())
-					buffer.WriteString(" ")
-				}
-				buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
-				seen[imp.GetPackage()] = struct{}{}
+	for _, imp := range f.InitializationPackages {
+		if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
+			if !didStartImportBlock {
+				buffer.WriteString("import (\n")
+				didStartImportBlock = true
 			}
-		}
 
-		for _, imp := range packages {
-			if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
-				buffer.WriteString("\t")
-				if imp.GetAlias() != "" {
-					buffer.WriteString(imp.GetAlias())
-					buffer.WriteString(" ")
-				}
-				buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
-				seen[imp.GetPackage()] = struct{}{}
+			buffer.WriteString("\t_ ")
+			buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
+			seen[imp.GetPackage()] = struct{}{}
+		}
+	}
+
+	for _, imp := range packages {
+		if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
+			if !didStartImportBlock {
+				buffer.WriteString("import (\n")
+				didStartImportBlock = true
 			}
-		}
 
+			buffer.WriteString("\t")
+			if imp.GetAlias() != "" {
+				buffer.WriteString(imp.GetAlias())
+				buffer.WriteString(" ")
+			}
+			buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
+			seen[imp.GetPackage()] = struct{}{}
+		}
+	}
+
+	if didStartImportBlock {
 		buffer.WriteString(")\n\n")
+	}
+
+	if f.Init != nil {
+		f.CodeBlocks = append([]CodeBlock{f.Init}, f.CodeBlocks...)
 	}
 
 	for _, codeBlk := range f.CodeBlocks {
@@ -63,10 +73,6 @@ func (f *FileSpec) String() string {
 	}
 
 	return buffer.String()
-}
-
-func (f *FileSpec) Packages() []TypeReference {
-	return []TypeReference{}
 }
 
 func (f *FileSpec) InitializationPackage(imp Import) *FileSpec {

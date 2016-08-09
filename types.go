@@ -142,7 +142,7 @@ func (t *TypeReferenceValue) GetName() string {
 	result := bytes.Buffer{}
 
 	result.WriteString(t.prefix)
-	result.WriteString(t.Import.GetQualifier())
+	result.WriteString(t.Import.getQualifier())
 	result.WriteString(t.Name)
 
 	return result.String()
@@ -180,7 +180,7 @@ func (t *TypeReferenceFunc) GetImports() []Import {
 func (t *TypeReferenceFunc) GetName() string {
 	result := bytes.Buffer{}
 
-	result.WriteString(t.Import.GetQualifier())
+	result.WriteString(t.Import.getQualifier())
 	result.WriteString(t.Name)
 
 	return result.String()

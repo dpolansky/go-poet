@@ -6,7 +6,6 @@ import (
 )
 
 // FileSpec represents a .go source file
->>>>>>> c66c5eb96c7d49ed805a884f436dfcbe53940869
 type FileSpec struct {
 	Package                string      // Package that the file belongs to
 	InitializationPackages []Import    // InitializationPackages include any imports that need to be included for their side effects

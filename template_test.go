@@ -8,22 +8,11 @@ import (
 )
 
 // Hook up gocheck into the "go test" runner.
-func TestTemplates(t *testing.T) { TestingT(t) }
+func TestGoPoet(t *testing.T) { TestingT(t) }
 
 type TemplateSuite struct{}
 
 var _ = Suite(&TemplateSuite{})
-
-// func (s *TemplateSuite) TestTemplateType(c *C) {
-// 	expected := "fmt.Println()"
-
-// 	fmtSpec := &TypeReferenceSpec{
-// 		Package: "fmt",
-// 	}
-
-// 	actual := Template("$T.Println()", fmtSpec)
-// 	c.Assert(actual, Equals, expected)
-// }
 
 func (s *TemplateSuite) TestTemplateTypeWithName(c *C) {
 	expected := "fmt.Println()"

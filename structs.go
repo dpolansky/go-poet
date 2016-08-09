@@ -34,9 +34,19 @@ func (s *StructSpec) String() string {
 	})
 
 	for _, field := range s.Fields {
+		var format string
+		arguments := []interface{}{field.Name, field.Type}
+
+		if field.Tag != "" {
+			format = "$L $T `$L`"
+			arguments = append(arguments, field.Tag)
+		} else {
+			format = "$L $T"
+		}
+
 		writer.WriteStatement(Statement{
-			Format:    "$L $T",
-			Arguments: []interface{}{field.Name, field.Type},
+			Format:    format,
+			Arguments: arguments,
 		})
 	}
 

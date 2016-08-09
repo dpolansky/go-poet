@@ -77,3 +77,54 @@ func (s *StructsSuite) TestStructWithVarTag(c *C) {
 
 	c.Assert(actual, Equals, expected)
 }
+
+func (s *StructsSuite) TestStructWithComment(c *C) {
+	expected := "" +
+		"// Test comment\n" +
+		"type foo struct {\n" +
+		"}\n"
+
+	st := NewStructSpec("foo")
+	st.StructComment("Test comment")
+
+	actual := st.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *StructsSuite) TestMethodFromStruct(c *C) {
+	expected := "" +
+		"func (f foo) bar() {\n" +
+		"}\n"
+
+	st := NewStructSpec("foo")
+	m := st.Method("bar", "f")
+
+	actual := m.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *StructsSuite) TestStructWithMethodAttached(c *C) {
+	expected := "" +
+		"type foo struct {\n" +
+		"}\n" +
+		"\n" +
+		"func (f foo) bar() {\n" +
+		"}\n" +
+		"\n"
+
+	st := NewStructSpec("foo")
+	st.MethodAndAttach("bar", "f")
+
+	actual := st.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *StructsSuite) TestStructName(c *C) {
+	expected := "foo"
+	st := NewStructSpec("foo")
+	actual := st.GetName()
+	c.Assert(actual, Equals, expected)
+}

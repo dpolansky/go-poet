@@ -45,6 +45,28 @@ func (f *FunctionsSuite) TestFunctionWithParameters(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (f *FunctionsSuite) TestFunctionWithSingleReturnParameter(c *C) {
+	expected := "" +
+		"func foo() string {\n" +
+		"}\n"
+	fnc := NewFuncSpec("foo")
+	fnc.ResultParameter("", TypeReferenceFromInstance(""))
+
+	actual := fnc.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FunctionsSuite) TestFunctionWithSingleNamedReturnParameter(c *C) {
+	expected := "" +
+		"func foo() (a string) {\n" +
+		"}\n"
+	fnc := NewFuncSpec("foo")
+	fnc.ResultParameter("a", TypeReferenceFromInstance(""))
+
+	actual := fnc.String()
+	c.Assert(actual, Equals, expected)
+}
+
 func (f *FunctionsSuite) TestFunctionWithReturnParameters(c *C) {
 	expected := "" +
 		"func foo() (string, int) {\n" +
@@ -76,6 +98,33 @@ func (f *FunctionsSuite) TestVariadicFunctionParameter(c *C) {
 
 	actual := NewFuncSpec("foo").VariadicParameter("bar", TypeReferenceFromInstance("")).String()
 
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FunctionsSuite) TestFunctionComment(c *C) {
+	expected := "" +
+		"// Comment\n" +
+		"func foo() {\n" +
+		"}\n"
+
+	actual := NewFuncSpec("foo").FunctionComment("Comment").String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FunctionsSuite) TestBlockStatements(c *C) {
+	expected := "" +
+		"func foo() {\n" +
+		"\tfor i:=0; i<5; i++ {\n" +
+		"\t\tfmt.Println(i)\n" +
+		"\t}\n" +
+		"}\n"
+
+	fnc := NewFuncSpec("foo")
+	fnc.BlockStart("for i:=0; i<5; i++")
+	fnc.Statement("$T($L)", TypeReferenceFromInstance(fmt.Println), "i")
+	fnc.BlockEnd()
+	actual := fnc.String()
 	c.Assert(actual, Equals, expected)
 }
 

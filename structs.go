@@ -1,8 +1,6 @@
 package gopoet
 
 type StructSpec struct {
-	// CodeBlock
-
 	Name    string
 	Comment string
 	Fields  []IdentifierField
@@ -10,6 +8,7 @@ type StructSpec struct {
 }
 
 var _ TypeReference = (*StructSpec)(nil)
+var _ CodeBlock = (*StructSpec)(nil)
 
 func NewStructSpec(name string) *StructSpec {
 	return &StructSpec{
@@ -33,6 +32,11 @@ func (s *StructSpec) GetName() string {
 
 func (s *StructSpec) String() string {
 	writer := NewCodeWriter()
+
+	if s.Comment != "" {
+		writer.WriteCode("// " + s.Comment + "\n")
+	}
+
 	writer.WriteStatement(Statement{
 		Format:      "type $L struct {",
 		Arguments:   []interface{}{s.Name},
@@ -69,16 +73,6 @@ func (s *StructSpec) String() string {
 		writer.WriteCode(method.String() + "\n")
 	}
 	return writer.String()
-}
-
-func (s *StructSpec) Packages() []TypeReference {
-	packages := []TypeReference{}
-
-	for _, field := range s.Fields {
-		packages = append(packages, field.Type)
-	}
-
-	return packages
 }
 
 func (s *StructSpec) StructComment(comment string) *StructSpec {

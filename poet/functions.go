@@ -13,7 +13,7 @@ type FuncSpec struct {
 	Statements       []Statement
 }
 
-var _ = (*FuncSpec)(nil)
+var _ CodeBlock = (*FuncSpec)(nil)
 
 func NewFuncSpec(name string) *FuncSpec {
 	return &FuncSpec{

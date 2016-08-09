@@ -1,14 +1,19 @@
 package poet
 
-import "bytes"
+import (
+	"bytes"
+	"fmt"
+)
 
+// FileSpec represents the necessary components to generate a go file
 type FileSpec struct {
-	Package                string
-	InitializationPackages []Import
-	Init                   CodeBlock
-	CodeBlocks             []CodeBlock
+	Package                string      // Package that the file belongs to
+	InitializationPackages []Import    // InitializationPackages include any imports that need to be included for their side effects
+	Init                   *FuncSpec   // Init is a single function to be outputted before all CodeBlocks
+	CodeBlocks             []CodeBlock // CodeBlocks are appeneded and when outputted separated by a newline
 }
 
+// NewFileSpec constructs a new FileSpec with the given package name
 func NewFileSpec(pkg string) *FileSpec {
 	return &FileSpec{
 		Package:                pkg,
@@ -17,6 +22,7 @@ func NewFileSpec(pkg string) *FileSpec {
 	}
 }
 
+// String produces the final go file string
 func (f *FileSpec) String() string {
 	var buffer bytes.Buffer
 	didStartImportBlock := false
@@ -63,11 +69,19 @@ func (f *FileSpec) String() string {
 		buffer.WriteString(")\n\n")
 	}
 
+	// create a new array with codeBlocks
+	var codeBlocks []CodeBlock
 	if f.Init != nil {
-		f.CodeBlocks = append([]CodeBlock{f.Init}, f.CodeBlocks...)
+		if f.Init.Name != "init" {
+			panic(fmt.Sprintf("the init function must be named 'init' (got '%s')", f.Init.Name))
+		}
+
+		codeBlocks = append([]CodeBlock{f.Init}, f.CodeBlocks...)
+	} else {
+		codeBlocks = append([]CodeBlock(nil), f.CodeBlocks...)
 	}
 
-	for _, codeBlk := range f.CodeBlocks {
+	for _, codeBlk := range codeBlocks {
 		buffer.WriteString(codeBlk.String())
 		buffer.WriteString("\n")
 	}
@@ -75,21 +89,25 @@ func (f *FileSpec) String() string {
 	return buffer.String()
 }
 
+// InitializationPackage appends an initialization package for its side effects
 func (f *FileSpec) InitializationPackage(imp Import) *FileSpec {
 	f.InitializationPackages = append(f.InitializationPackages, imp)
 	return f
 }
 
+// CodeBlock appends a CodeBlock
 func (f *FileSpec) CodeBlock(blk CodeBlock) *FileSpec {
 	f.CodeBlocks = append(f.CodeBlocks, blk)
 	return f
 }
 
-func (f *FileSpec) InitFunction(blk CodeBlock) *FileSpec {
+// InitFunction assign an init function
+func (f *FileSpec) InitFunction(blk *FuncSpec) *FileSpec {
 	f.Init = blk
 	return f
 }
 
+// GlobalVariable produces a global variable
 func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
 	v := &Variable{
 		Identifier: Identifier{
@@ -104,6 +122,7 @@ func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string,
 	return f
 }
 
+// GlobalConstant produces a global constant
 func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string, args ...interface{}) *FileSpec {
 	v := &Variable{
 		Identifier: Identifier{
@@ -118,6 +137,7 @@ func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string,
 	return f
 }
 
+// VariableGrouping creates a VariableGrouping and returns it
 func (f *FileSpec) VariableGrouping() *VariableGrouping {
 	v := &VariableGrouping{}
 	f.CodeBlocks = append(f.CodeBlocks, v)

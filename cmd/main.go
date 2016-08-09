@@ -39,5 +39,8 @@ func main() {
 	varGroup.Constant("aah", byteRef, "$L", 1)
 	varGroup.Variable("haa", gopoet.TypeReferenceFromInstance(""), "$S", "test")
 
+	enumGroup := fileSpec.VariableGrouping()
+	enumGroup.Constant("enumVal1", byteRef, "iota", 1)
+
 	fmt.Println(fileSpec.String())
 }

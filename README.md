@@ -173,7 +173,7 @@ produces
 func foo(buf *bytes.Buffer) {
 }
 ```
-The `poet.TypeReferenceFromInstance` function takes an instance of a variable or a function and uses reflection to determine it's type and package.
+The `poet.TypeReferenceFromInstance` function takes an instance of a variable or a function and uses reflection to determine its type and package.
 
 ### Package Aliases
 To use an aliased package's name from a TypeReference, use `poet.TypeReferenceFromInstanceWithAlias`.

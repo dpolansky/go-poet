@@ -8,6 +8,8 @@
 
 go-poet is a Go package for generating Go code, inspired by [javapoet](https://github.com/square/javapoet).
 
+Typically, code generation uses text templating which can be error prone and hard to maintain. This project aims to fix these issues by giving you an API to generate Go constructs in a typesafe way, while handling imports and formatting for you.
+
   - [Installation](#installation)
   - [Example](#example)
   - [Getting Started](#getting-started)
@@ -58,7 +60,7 @@ The end goal of go-poet is to create a compilable file. To construct a new file 
 file := poet.NewFileSpec("main")
 ```  
 
-Files contain CodeBlocks which can be global variables, functions, structs, interfaces. Go-poet will handle any imports for you via TypeReferences.
+Files contain CodeBlocks which can be global variables, functions, structs, interfaces. go-poet will handle any imports for you via TypeReferences.
 The types that you create or reference can be used in code via Templates.
 
 ## Code Blocks
@@ -69,15 +71,30 @@ add := poet.NewFuncSpec("add").
 	Parameter("a", poet.TypeReferenceFromInstance(int(0))).
 	Parameter("b", poet.TypeReferenceFromInstance(int(0))).
 	ResultParameter("", poet.TypeReferenceFromInstance(int(0))).
-        Statement("return a + b")
+    Statement("return a + b")
     
 file.CodeBlock(add)
 ```
-
 This will produce the function:
 ```go
 func add(a int, b int) int {
         return a + b
+}
+```
+
+To add control flow statements, use BlockStart and BlockEnd. Indentation will be handled for you.
+```go
+loop := poet.NewFuncSpec("loop").
+	BlockStart("for i := 0; i < 5; i++").
+	Statement("$T($L)", poet.TypeReferenceFromInstance(fmt.Println), "i").
+	BlockEnd()
+```
+produces
+```go
+func loop() {
+    for i := 0; i < 5; i++ {
+        fmt.Println(i)
+    }
 }
 ```
 ### Interfaces

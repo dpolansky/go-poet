@@ -4,7 +4,7 @@ type StructSpec struct {
 	Name    string
 	Comment string
 	Fields  []IdentifierField
-	Methods []MethodSpec
+	Methods []*MethodSpec
 }
 
 var _ TypeReference = (*StructSpec)(nil)
@@ -101,12 +101,34 @@ func (s *StructSpec) FieldWithTag(name string, typeRef TypeReference, tag string
 	return s
 }
 
+func (s *StructSpec) AttachFunction(receiverName string, funcSpec *FuncSpec) *StructSpec {
+	method := &MethodSpec{
+		FuncSpec:     *funcSpec,
+		ReceiverName: receiverName,
+		Receiver:     s.TypeReferenceAsPointer(),
+	}
+	s.Methods = append(s.Methods, method)
+	return s
+}
+
 func (s *StructSpec) Method(name, receiverName string) *MethodSpec {
 	return NewMethodSpec(name, receiverName, s)
 }
 
 func (s *StructSpec) MethodAndAttach(name, receiverName string) *MethodSpec {
 	method := NewMethodSpec(name, receiverName, s)
-	s.Methods = append(s.Methods, *method)
+	s.Methods = append(s.Methods, method)
 	return method
+}
+
+type structSpecAsPointer struct {
+	StructSpec
+}
+
+func (sP *structSpecAsPointer) GetName() string {
+	return "*" + sP.Name
+}
+
+func (s *StructSpec) TypeReferenceAsPointer() TypeReference {
+	return &structSpecAsPointer{*s}
 }

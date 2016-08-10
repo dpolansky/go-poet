@@ -23,7 +23,7 @@ func NewMethodSpec(name, receiverName string, receiver TypeReference) *MethodSpe
 }
 
 func (m *MethodSpec) String() string {
-	writer := NewCodeWriter()
+	writer := newCodeWriter()
 
 	writer.WriteStatement(m.createSignature())
 
@@ -31,7 +31,7 @@ func (m *MethodSpec) String() string {
 		writer.WriteStatement(st)
 	}
 
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		BeforeIndent: -1,
 		Format:       "}",
 	})
@@ -39,7 +39,7 @@ func (m *MethodSpec) String() string {
 	return writer.String()
 }
 
-func (m *MethodSpec) createSignature() Statement {
+func (m *MethodSpec) createSignature() statement {
 	formatStr := bytes.Buffer{}
 	signature, args := m.Signature()
 
@@ -52,7 +52,7 @@ func (m *MethodSpec) createSignature() Statement {
 	formatStr.WriteString(signature)
 	formatStr.WriteString(" {")
 
-	return Statement{
+	return statement{
 		AfterIndent: 1,
 		Format:      formatStr.String(),
 		Arguments:   args,

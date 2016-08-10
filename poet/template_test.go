@@ -19,7 +19,7 @@ func (s *TemplateSuite) TestTemplateTypeWithName(c *C) {
 
 	fmtSpec := TypeReferenceFromInstance(fmt.Println)
 
-	actual := Template("$T()", fmtSpec)
+	actual := template("$T()", fmtSpec)
 	c.Assert(actual, Equals, expected)
 }
 
@@ -28,7 +28,7 @@ func (s *TemplateSuite) TestTemplateWithString(c *C) {
 
 	fmtSpec := TypeReferenceFromInstance(fmt.Println)
 
-	actual := Template("$T($S)", fmtSpec, "Hello World")
+	actual := template("$T($S)", fmtSpec, "Hello World")
 	c.Assert(actual, Equals, expected)
 }
 
@@ -38,7 +38,7 @@ func (s *TemplateSuite) TestTemplatePanicsWithNotEnoughArgs(c *C) {
 		}
 	}()
 
-	Template("$T()")
+	template("$T()")
 	c.Fail()
 }
 
@@ -48,7 +48,7 @@ func (s *TemplateSuite) TestTemplatePanicsWithNonTypeReference(c *C) {
 		}
 	}()
 
-	Template("$T()", 1)
+	template("$T()", 1)
 	c.Fail()
 }
 
@@ -58,6 +58,6 @@ func (s *TemplateSuite) TestTemplatePanicsWithInvalidTemplatingString(c *C) {
 		}
 	}()
 
-	Template("$D()", TypeReferenceFromInstance(fmt.Println))
+	template("$D()", TypeReferenceFromInstance(fmt.Println))
 	c.Fail()
 }

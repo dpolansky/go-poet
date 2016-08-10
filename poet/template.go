@@ -8,7 +8,7 @@ import (
 
 const templatingChar = '$'
 
-func Template(format string, args ...interface{}) string {
+func template(format string, args ...interface{}) string {
 	var buffer bytes.Buffer
 
 	currentArg := 0

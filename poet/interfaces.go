@@ -48,21 +48,21 @@ func (i *InterfaceSpec) GetImports() []Import {
 
 // String outputs the interface declaration
 func (i *InterfaceSpec) String() string {
-	writer := NewCodeWriter()
+	writer := newCodeWriter()
 	if i.Comment != "" {
-		writer.WriteStatement(Statement{
+		writer.WriteStatement(statement{
 			Format:    "// $L",
 			Arguments: []interface{}{i.Comment},
 		})
 	}
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:      "type $L interface {",
 		Arguments:   []interface{}{i.Name},
 		AfterIndent: 1,
 	})
 
 	for _, interf := range i.EmbeddedInterfaces {
-		writer.WriteStatement(Statement{
+		writer.WriteStatement(statement{
 			Format:    "$L",
 			Arguments: []interface{}{interf.GetName()},
 		})
@@ -70,19 +70,19 @@ func (i *InterfaceSpec) String() string {
 
 	for _, method := range i.Methods {
 		if method.Comment != "" {
-			writer.WriteStatement(Statement{
+			writer.WriteStatement(statement{
 				Format:    "// $L",
 				Arguments: []interface{}{method.Comment},
 			})
 		}
 		signature, args := method.Signature()
-		writer.WriteStatement(Statement{
+		writer.WriteStatement(statement{
 			Format:    signature,
 			Arguments: args,
 		})
 	}
 
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:       "}",
 		BeforeIndent: -1,
 	})

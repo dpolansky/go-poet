@@ -31,13 +31,13 @@ func (s *StructSpec) GetName() string {
 }
 
 func (s *StructSpec) String() string {
-	writer := NewCodeWriter()
+	writer := newCodeWriter()
 
 	if s.Comment != "" {
 		writer.WriteCode("// " + s.Comment + "\n")
 	}
 
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:      "type $L struct {",
 		Arguments:   []interface{}{s.Name},
 		AfterIndent: 1,
@@ -54,13 +54,13 @@ func (s *StructSpec) String() string {
 			format = "$L $T"
 		}
 
-		writer.WriteStatement(Statement{
+		writer.WriteStatement(statement{
 			Format:    format,
 			Arguments: arguments,
 		})
 	}
 
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:       "}",
 		BeforeIndent: -1,
 	})

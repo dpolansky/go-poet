@@ -50,25 +50,25 @@ func newTypeReferenceFromInstance(t interface{}, alias string) TypeReference {
 	return newTypeReferenceFromValue(t, alias)
 }
 
-type TypeReferenceMap struct {
+type typeReferenceMap struct {
 	KeyType   TypeReference
 	ValueType TypeReference
 	prefix    string
 }
 
-var _ TypeReference = (*TypeReferenceMap)(nil)
+var _ TypeReference = (*typeReferenceMap)(nil)
 
 func newTypeReferenceFromMap(t interface{}, prefix string) TypeReference {
 	refType := reflect.TypeOf(t)
 
-	return &TypeReferenceMap{
+	return &typeReferenceMap{
 		KeyType:   newTypeReferenceFromInstance(reflect.New(refType.Key()).Elem().Interface(), ""),
 		ValueType: newTypeReferenceFromInstance(reflect.New(refType.Elem()).Elem().Interface(), ""),
 		prefix:    prefix,
 	}
 }
 
-func (t *TypeReferenceMap) GetImports() []Import {
+func (t *typeReferenceMap) GetImports() []Import {
 	imports := []Import{}
 
 	imports = append(imports, t.KeyType.GetImports()...)
@@ -76,21 +76,21 @@ func (t *TypeReferenceMap) GetImports() []Import {
 	return imports
 }
 
-func (t *TypeReferenceMap) GetName() string {
+func (t *typeReferenceMap) GetName() string {
 	return fmt.Sprintf("%smap[%s]%s", t.prefix, t.KeyType.GetName(), t.ValueType.GetName())
 }
 
-type TypeReferenceValue struct {
+type typeReferenceValue struct {
 	Import *ImportSpec
 	Name   string
 	prefix string
 }
 
-var _ TypeReference = (*TypeReferenceValue)(nil)
+var _ TypeReference = (*typeReferenceValue)(nil)
 
 func newTypeReferenceFromValue(t interface{}, alias string) TypeReference {
 	refType := reflect.TypeOf(t)
-	result := &TypeReferenceValue{}
+	result := &typeReferenceValue{}
 
 	result.prefix, refType = dereferenceType("", refType)
 
@@ -134,11 +134,11 @@ func dereferenceType(prefix string, refType reflect.Type) (string, reflect.Type)
 	return prefix, refType
 }
 
-func (t *TypeReferenceValue) GetImports() []Import {
+func (t *typeReferenceValue) GetImports() []Import {
 	return []Import{t.Import}
 }
 
-func (t *TypeReferenceValue) GetName() string {
+func (t *typeReferenceValue) GetName() string {
 	result := bytes.Buffer{}
 
 	result.WriteString(t.prefix)
@@ -148,18 +148,18 @@ func (t *TypeReferenceValue) GetName() string {
 	return result.String()
 }
 
-type TypeReferenceFunc struct {
+type typeReferenceFunc struct {
 	Import *ImportSpec
 	Name   string
 }
 
-var _ TypeReference = (*TypeReferenceFunc)(nil)
+var _ TypeReference = (*typeReferenceFunc)(nil)
 
 func newTypeReferenceFromFunction(t interface{}, alias string) TypeReference {
 	funcPtr := runtime.FuncForPC(reflect.ValueOf(t).Pointer())
 	fullyQualifiedPieces := strings.Split(funcPtr.Name(), ".")
 
-	return &TypeReferenceFunc{
+	return &typeReferenceFunc{
 		Import: &ImportSpec{
 			Qualified: true,
 			Package:   fullyQualifiedPieces[0],
@@ -169,11 +169,11 @@ func newTypeReferenceFromFunction(t interface{}, alias string) TypeReference {
 	}
 }
 
-func (t *TypeReferenceFunc) GetImports() []Import {
+func (t *typeReferenceFunc) GetImports() []Import {
 	return []Import{t.Import}
 }
 
-func (t *TypeReferenceFunc) GetName() string {
+func (t *typeReferenceFunc) GetName() string {
 	result := bytes.Buffer{}
 
 	result.WriteString(t.Import.getQualifier())

@@ -8,7 +8,7 @@ var _ = Suite(&CodeWriterSuite{})
 
 func (f *CodeWriterSuite) TestCodeWriterSingleCode(c *C) {
 	expected := "this is a test"
-	writer := CodeWriter{}
+	writer := &codeWriter{}
 	writer.WriteCode("this is a test")
 	actual := writer.String()
 
@@ -17,10 +17,10 @@ func (f *CodeWriterSuite) TestCodeWriterSingleCode(c *C) {
 
 func (f *CodeWriterSuite) TestCodeWriterSingleStatement(c *C) {
 	expected := "this is a test\n"
-	s := Statement{
+	s := statement{
 		Format: "this is a test",
 	}
-	writer := CodeWriter{}
+	writer := &codeWriter{}
 	writer.WriteStatement(s)
 	actual := writer.String()
 
@@ -29,11 +29,11 @@ func (f *CodeWriterSuite) TestCodeWriterSingleStatement(c *C) {
 
 func (f *CodeWriterSuite) TestCodeWriterPreindentStatement(c *C) {
 	expected := "\t\tthis is a test\n"
-	s := Statement{
+	s := statement{
 		Format:       "this is a test",
 		BeforeIndent: 2,
 	}
-	writer := CodeWriter{}
+	writer := &codeWriter{}
 	writer.WriteStatement(s)
 	actual := writer.String()
 
@@ -46,20 +46,20 @@ func (f *CodeWriterSuite) TestCodeWriterMixedIndentStatement(c *C) {
 		"gone\n" +
 		"\tbut back\n"
 
-	writer := CodeWriter{}
-	writer.WriteStatement(Statement{
+	writer := &codeWriter{}
+	writer.WriteStatement(statement{
 		Format:       "this is a test",
 		BeforeIndent: 2,
 	})
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:       "still going",
 		BeforeIndent: -1,
 	})
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:       "gone",
 		BeforeIndent: -1,
 	})
-	writer.WriteStatement(Statement{
+	writer.WriteStatement(statement{
 		Format:       "but back",
 		BeforeIndent: 1,
 	})

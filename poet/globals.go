@@ -100,9 +100,9 @@ func (v *Variable) GetImports() []Import {
 
 func (v *Variable) GetDeclaration() string {
 	buff := bytes.Buffer{}
-	buff.WriteString(Template("$L $T", v.Name, v.Type))
+	buff.WriteString(template("$L $T", v.Name, v.Type))
 	buff.WriteString(" = ")
-	buff.WriteString(Template(v.Format, v.Args...))
+	buff.WriteString(template(v.Format, v.Args...))
 	return buff.String()
 }
 

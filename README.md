@@ -54,13 +54,13 @@ file := poet.NewFileSpec("main").
 ## Getting Started
 To get started, import `"github.com/dpolansky/go-poet/poet"`
 
-The end goal of go-poet is to create a compilable file. To construct a new file with package `main`:
+The end goal of go-poet is to create a compilable file. To construct a new file with package `main`
 
 ```go
 file := poet.NewFileSpec("main")
 ```  
 
-Files contain CodeBlocks which can be global variables, functions, structs, interfaces. go-poet will handle any imports for you via TypeReferences.
+Files contain CodeBlocks which can be global variables, functions, structs, and interfaces. go-poet will handle any imports for you via TypeReferences.
 The types that you create or reference can be used in code via Templates.
 
 ## Code Blocks
@@ -75,7 +75,7 @@ add := poet.NewFuncSpec("add").
     
 file.CodeBlock(add)
 ```
-This will produce the function:
+which produces
 ```go
 func add(a int, b int) int {
         return a + b

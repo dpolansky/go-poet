@@ -86,7 +86,7 @@ func (s *TypeSuite) TestMapImports(c *C) {
 
 func (s *TypeSuite) TestPrimitive(c *C) {
 	expected := "int"
-	typeRef := TypeReferenceFromInstance(1)
+	typeRef := Int
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)
@@ -94,7 +94,7 @@ func (s *TypeSuite) TestPrimitive(c *C) {
 
 func (s *TypeSuite) TestBoolean(c *C) {
 	expected := "bool"
-	typeRef := TypeReferenceFromInstance(false)
+	typeRef := Bool
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)
@@ -102,7 +102,7 @@ func (s *TypeSuite) TestBoolean(c *C) {
 
 func (s *TypeSuite) TestByte(c *C) {
 	expected := "byte"
-	typeRef := TypeReferenceFromInstanceWithCustomName(byte('A'), "byte")
+	typeRef := Byte
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)

@@ -10,6 +10,28 @@ import (
 
 const UnqualifiedPrefix = "_unqualified"
 
+var (
+	String     = TypeReferenceFromInstance("")
+	Bool       = TypeReferenceFromInstance(false)
+	Int        = TypeReferenceFromInstance(0)
+	Int8       = TypeReferenceFromInstance(int8(0))
+	Int16      = TypeReferenceFromInstance(int16(0))
+	Int32      = TypeReferenceFromInstance(int32(0))
+	Int64      = TypeReferenceFromInstance(int64(0))
+	Uint       = TypeReferenceFromInstance(uint(0))
+	Uint8      = TypeReferenceFromInstance(uint8(0))
+	Uint16     = TypeReferenceFromInstance(uint16(0))
+	Uint32     = TypeReferenceFromInstance(uint32(0))
+	Uint64     = TypeReferenceFromInstance(uint64(0))
+	Uintptr    = TypeReferenceFromInstance(uintptr(0))
+	Float32    = TypeReferenceFromInstance(float32(0))
+	Float64    = TypeReferenceFromInstance(float64(0))
+	Complex64  = TypeReferenceFromInstance(complex64(0))
+	Complex128 = TypeReferenceFromInstance(complex128(0))
+	Byte       = TypeReferenceFromInstanceWithCustomName(uint8(0), "byte")
+	Rune       = TypeReferenceFromInstanceWithCustomName(int32(0), "rune")
+)
+
 // TypeReferenceFromInstance creates an TypeReference from an existing type
 func TypeReferenceFromInstance(t interface{}) TypeReference {
 	return newTypeReferenceFromInstance(t, "")

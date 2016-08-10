@@ -68,9 +68,9 @@ The types that you create or reference can be used in code via Templates.
 Functions can be attached to a File:
 ```go
 add := poet.NewFuncSpec("add").
-	Parameter("a", poet.TypeReferenceFromInstance(int(0))).
-	Parameter("b", poet.TypeReferenceFromInstance(int(0))).
-	ResultParameter("", poet.TypeReferenceFromInstance(int(0))).
+	Parameter("a", poet.Int).
+	Parameter("b", poet.Int).
+	ResultParameter("", poet.Int).
     Statement("return a + b")
     
 file.CodeBlock(add)
@@ -132,8 +132,8 @@ func (f *foo) add(a int, b int) int {
 ### Globals
 Global variables and constants can be added directly to a file, either standalone or in groups.
 ```go
-file.GlobalVariable("a", poet.TypeReferenceFromInstance(""), "$S", "hello")
-file.GlobalConstant("b", poet.TypeReferenceFromInstance(0), "$L", 1)
+file.GlobalVariable("a", poet.String, "$S", "hello")
+file.GlobalConstant("b", poet.Int, "$L", 1)
 ```
 ```go
 var a string = "hello"
@@ -144,10 +144,10 @@ const b int = 1
 or if you want to group them
 ```go
 file.VariableGrouping().
-		Variable("a", poet.TypeReferenceFromInstance(0), "$L", 7).
-		Variable("b", poet.TypeReferenceFromInstance(0), "$L", 2).
-		Constant("c", poet.TypeReferenceFromInstance(0), "$L", 3).
-		Constant("d", poet.TypeReferenceFromInstance(0), "$L", 43)
+		Variable("a", poet.Int, "$L", 7).
+		Variable("b", poet.Int, "$L", 2).
+		Constant("c", poet.Int, "$L", 3).
+		Constant("d", poet.Int, "$L", 43)
 ```
 ```go
 const (
@@ -186,11 +186,11 @@ produces a TypeReference with type
 ```
 
 ### Custom Names
-For type aliases, such as `byte` which aliases `uint8`, you may want to reference the aliased name instead of the underlying type.
+For type aliases, you may want to reference the aliased name instead of the underlying type.
 
 To do this, use `poet.TypeReferenceFromInstanceWithCustomName`
 ```go
-poet.TypeReferenceFromInstanceWithCustomName(byte('A'), "byte")
+poet.TypeReferenceFromInstanceWithCustomName(uint8(0), "byte")
 ```
 ### Unqualified Types
 If you want a type to be unqualified, create a type alias with the prefix `_unqualified` followed by the name

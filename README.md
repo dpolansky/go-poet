@@ -29,7 +29,7 @@ $ go get github.com/dpolansky/go-poet/poet
 
 ## Example
 Here's a Hello World Go file
-```
+```go
 package main
 
 import (
@@ -41,7 +41,7 @@ func main() {
 }
 ```
 and the go-poet code to generate it
-```
+```go
 main := poet.NewFuncSpec("main").
 		Statement("$T($S)", poet.TypeReferenceFromInstance(fmt.Println), "Hello world!")
 
@@ -54,7 +54,7 @@ To get started, import `"github.com/dpolansky/go-poet/poet"`
 
 The end goal of go-poet is to create a compilable file. To construct a new file with package `main`:
 
-```
+```go
 file := poet.NewFileSpec("main")
 ```  
 
@@ -64,7 +64,7 @@ The types that you create or reference can be used in code via Templates.
 ## Code Blocks
 ### Functions
 Functions can be attached to a File:
-```
+```go
 add := poet.NewFuncSpec("add").
 	Parameter("a", poet.TypeReferenceFromInstance(int(0))).
 	Parameter("b", poet.TypeReferenceFromInstance(int(0))).
@@ -75,19 +75,19 @@ file.CodeBlock(add)
 ```
 
 This will produce the function:
-```
+```go
 func add(a int, b int) int {
         return a + b
 }
 ```
 ### Interfaces
-```
+```go
 inter := poet.NewInterfaceSpec("AddWriter").
 	EmbedInterface(poet.TypeReferenceFromInstance((*io.Writer)(nil))).
 	Method(add)
 ```
 produces
-```
+```go
 type AddWriter interface {
         io.Writer
         add(a int, b int) int
@@ -96,13 +96,13 @@ type AddWriter interface {
 
 ### Structs
 Structs can have fields, directly attached methods, and a comment.
-```
+```go
 foo := poet.NewStructSpec("foo").
 	Field("buf", poet.TypeReferenceFromInstance(&bytes.Buffer{})).
 	AttachFunction("f", add)
 ```
 produces
-```
+```go
 type foo struct {
         buf *bytes.Buffer
 }
@@ -114,25 +114,25 @@ func (f *foo) add(a int, b int) int {
 
 ### Globals
 Global variables and constants can be added directly to a file, either standalone or in groups.
-```
+```go
 file.GlobalVariable("a", poet.TypeReferenceFromInstance(""), "$S", "hello")
 file.GlobalConstant("b", poet.TypeReferenceFromInstance(0), "$L", 1)
 ```
-```
+```go
 var a string = "hello"
 
 const b int = 1
 ```
 
 or if you want to group them
-```
+```go
 file.VariableGrouping().
 		Variable("a", poet.TypeReferenceFromInstance(0), "$L", 7).
 		Variable("b", poet.TypeReferenceFromInstance(0), "$L", 2).
 		Constant("c", poet.TypeReferenceFromInstance(0), "$L", 3).
 		Constant("d", poet.TypeReferenceFromInstance(0), "$L", 43)
 ```
-```
+```go
 const (
         c int = 3
         d int = 43
@@ -148,11 +148,11 @@ var (
 To ensure type safe code and handle a generated file's imports, use TypeReferences.
 
 For example, to use `bytes.Buffer` as a parameter to a function
-```
+```go
 poet.NewFuncSpec("foo").Parameter("buf", poet.TypeReferenceFromInstance(&bytes.Buffer{}))
 ```
 produces
-```
+```go
 func foo(buf *bytes.Buffer) {
 }
 ```
@@ -160,11 +160,11 @@ The `poet.TypeReferenceFromInstance` function takes an instance of a variable or
 
 ### Package Aliases
 To use an aliased package's name from a TypeReference, use `poet.TypeReferenceFromInstanceWithAlias`.
-```
+```go
 TypeReferenceFromInstanceWithAlias(&bytes.Buffer{}, "myAlias")
 ```
 produces a TypeReference with type
-```
+```go
 *myAlias.Buffer
 ```
 
@@ -172,12 +172,12 @@ produces a TypeReference with type
 For type aliases, such as `byte` which aliases `uint8`, you may want to reference the aliased name instead of the underlying type.
 
 To do this, use `poet.TypeReferenceFromInstanceWithCustomName`
-```
+```go
 poet.TypeReferenceFromInstanceWithCustomName(byte('A'), "byte")
 ```
 ### Unqualified Types
 If you want a type to be unqualified, create a type alias with the prefix `_unqualified` followed by the name
-```
+```go
 type _unqualifiedBuffer bytes.Buffer
 typeRef := TypeReferenceFromInstance(_unqualifiedBuffer{})
 ```

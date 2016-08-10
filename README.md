@@ -23,13 +23,11 @@ go-poet is a Go package for generating Go code, inspired by [javapoet](https://g
   - [Templating](#templating)
 
 ## Installation
-------------
 ```
 $ go get github.com/dpolansky/go-poet/poet
 ```
 
 ## Example
-------------
 Here's a Hello World Go file
 ```
 package main
@@ -52,7 +50,6 @@ file := poet.NewFileSpec("main").
 ```
 
 ## Getting Started
-------------
 To get started, import `"github.com/dpolansky/go-poet/poet"`
 
 The end goal of go-poet is to create a compilable file. To construct a new file with package `main`:
@@ -65,7 +62,6 @@ Files contain CodeBlocks which can be global variables, functions, structs, inte
 The types that you create or reference can be used in code via Templates.
 
 ## Code Blocks
-------------
 ### Functions
 Functions can be attached to a File:
 ```
@@ -149,7 +145,6 @@ var (
 
 ```
 ## Type References
-------------
 To ensure type safe code and handle a generated file's imports, use TypeReferences.
 
 For example, to use `bytes.Buffer` as a parameter to a function
@@ -189,15 +184,14 @@ typeRef := TypeReferenceFromInstance(_unqualifiedBuffer{})
 produces the type `Buffer`
 
 ## Templating
-------------
 Format strings are used to construct statements in functions or values for variables.
 
 We currently support these format specifiers:
 * **Strings** `$S` Takes a `string` as input, surrounding it with quotes and escaping quotes within the input
 * **Literals** `$L` Takes any value as input, and uses Go's `Sprintf` `%v` formatting to write the input
 * **Types** `$T` Takes a TypeReference as input, and writes its qualified/aliased name
+
 ## Authors
-------------
 [Dave Polansky](http://github.com/dpolansky)
 
 [Kevin Deenanauth](http://github.com/kdeenanauth)

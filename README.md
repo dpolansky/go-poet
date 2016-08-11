@@ -35,20 +35,20 @@ Here's a Hello World Go file
 package main
 
 import (
-        "fmt"
+    "fmt"
 )
 
 func main() {
-        fmt.Println("Hello world!")
+    fmt.Println("Hello world!")
 }
 ```
 and the go-poet code to generate it
 ```go
 main := poet.NewFuncSpec("main").
-		Statement("$T($S)", poet.TypeReferenceFromInstance(fmt.Println), "Hello world!")
+	Statement("$T($S)", poet.TypeReferenceFromInstance(fmt.Println), "Hello world!")
 
 file := poet.NewFileSpec("main").
-		CodeBlock(main)
+	CodeBlock(main)
 ```
 
 ## Getting Started
@@ -65,20 +65,18 @@ The types that you create or reference can be used in code via Templates.
 
 ## Code Blocks
 ### Functions
-Functions can be attached to a File:
+Functions can have parameters, result parameters, and statements within them.
 ```go
 add := poet.NewFuncSpec("add").
 	Parameter("a", poet.Int).
 	Parameter("b", poet.Int).
 	ResultParameter("", poet.Int).
-    Statement("return a + b")
-    
-file.CodeBlock(add)
+	Statement("return a + b")
 ```
 which produces
 ```go
 func add(a int, b int) int {
-        return a + b
+    return a + b
 }
 ```
 
@@ -98,6 +96,7 @@ func loop() {
 }
 ```
 ### Interfaces
+Interfaces can have other interfaces embedded within them, as well as method declarations.
 ```go
 inter := poet.NewInterfaceSpec("AddWriter").
 	EmbedInterface(poet.TypeReferenceFromInstance((*io.Writer)(nil))).
@@ -106,8 +105,8 @@ inter := poet.NewInterfaceSpec("AddWriter").
 produces
 ```go
 type AddWriter interface {
-        io.Writer
-        add(a int, b int) int
+    io.Writer
+    add(a int, b int) int
 }
 ```
 
@@ -115,17 +114,19 @@ type AddWriter interface {
 Structs can have fields, directly attached methods, and a comment.
 ```go
 foo := poet.NewStructSpec("foo").
-	Field("buf", poet.TypeReferenceFromInstance(&bytes.Buffer{})).
-	AttachFunction("f", add)
+	Field("buf", poet.TypeReferenceFromInstance(&bytes.Buffer{}))
+
+m := foo.MethodFromFunction("f", true, add)
+foo.AttachMethod(m)
 ```
 produces
 ```go
 type foo struct {
-        buf *bytes.Buffer
+    buf *bytes.Buffer
 }
 
 func (f *foo) add(a int, b int) int {
-        return a + b
+    return a + b
 }
 ```
 
@@ -144,20 +145,20 @@ const b int = 1
 or if you want to group them
 ```go
 file.VariableGrouping().
-		Variable("a", poet.Int, "$L", 7).
-		Variable("b", poet.Int, "$L", 2).
-		Constant("c", poet.Int, "$L", 3).
-		Constant("d", poet.Int, "$L", 43)
+	Variable("a", poet.Int, "$L", 7).
+	Variable("b", poet.Int, "$L", 2).
+	Constant("c", poet.Int, "$L", 3).
+	Constant("d", poet.Int, "$L", 43)
 ```
 ```go
 const (
-        c int = 3
-        d int = 43
+    c int = 3
+    d int = 43
 )
 
 var (
-        a int = 7
-        b int = 2
+    a int = 7
+    b int = 2
 )
 
 ```
@@ -178,7 +179,7 @@ The `poet.TypeReferenceFromInstance` function takes an instance of a variable or
 ### Package Aliases
 To use an aliased package's name from a TypeReference, use `poet.TypeReferenceFromInstanceWithAlias`.
 ```go
-TypeReferenceFromInstanceWithAlias(&bytes.Buffer{}, "myAlias")
+poet.TypeReferenceFromInstanceWithAlias(&bytes.Buffer{}, "myAlias")
 ```
 produces a TypeReference with type
 ```go

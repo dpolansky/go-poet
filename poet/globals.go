@@ -2,12 +2,15 @@ package poet
 
 import "bytes"
 
+// VariableGrouping represents a collection of variables and/or constants that will
+// be separated into groups on output.
 type VariableGrouping struct {
 	Variables []*Variable
 }
 
 var _ CodeBlock = (*VariableGrouping)(nil)
 
+// Variable adds a new variable to this variable grouping.
 func (g *VariableGrouping) Variable(name string, typ TypeReference, format string, args ...interface{}) *VariableGrouping {
 	v := &Variable{
 		Identifier: Identifier{
@@ -22,6 +25,7 @@ func (g *VariableGrouping) Variable(name string, typ TypeReference, format strin
 	return g
 }
 
+// Constant adds a new constant to this variable grouping.
 func (g *VariableGrouping) Constant(name string, typ TypeReference, format string, args ...interface{}) *VariableGrouping {
 	v := &Variable{
 		Identifier: Identifier{
@@ -36,6 +40,7 @@ func (g *VariableGrouping) Constant(name string, typ TypeReference, format strin
 	return g
 }
 
+// GetImports returns a slice of imports that this variable grouping uses.
 func (g *VariableGrouping) GetImports() []Import {
 	imports := []Import{}
 	for _, vari := range g.Variables {
@@ -85,6 +90,7 @@ func writeGroupAsString(groupName string, vars []*Variable) string {
 	return buf.String()
 }
 
+// Variable represents a variable, with name, type, and value.
 type Variable struct {
 	Identifier
 	Constant bool
@@ -94,10 +100,12 @@ type Variable struct {
 
 var _ CodeBlock = (*Variable)(nil)
 
+// GetImports returns a slice of imports that this variable uses.
 func (v *Variable) GetImports() []Import {
 	return v.Type.GetImports()
 }
 
+// GetDeclaration returns the name and type of this variable, for example: 'foo string'.
 func (v *Variable) GetDeclaration() string {
 	buff := bytes.Buffer{}
 	buff.WriteString(template("$L $T", v.Name, v.Type))

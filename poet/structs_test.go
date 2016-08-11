@@ -98,7 +98,20 @@ func (s *StructsSuite) TestMethodFromStruct(c *C) {
 		"}\n"
 
 	st := NewStructSpec("foo")
-	m := st.Method("bar", "f")
+	m := st.Method("bar", "f", false)
+
+	actual := m.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *StructsSuite) TestMethodFromStructWithPointerReceiver(c *C) {
+	expected := "" +
+		"func (f *foo) bar() {\n" +
+		"}\n"
+
+	st := NewStructSpec("foo")
+	m := st.Method("bar", "f", true)
 
 	actual := m.String()
 
@@ -115,8 +128,26 @@ func (s *StructsSuite) TestStructWithMethodAttached(c *C) {
 		"\n"
 
 	st := NewStructSpec("foo")
-	st.MethodAndAttach("bar", "f")
+	m := st.Method("bar", "f", false)
+	st.AttachMethod(m)
 
+	actual := st.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *StructsSuite) TestStructFunctionAsMethod(c *C) {
+	expected := "" +
+		"type foo struct {\n" +
+		"}\n" +
+		"\n" +
+		"func (f foo) bar() {\n" +
+		"}\n" +
+		"\n"
+
+	st := NewStructSpec("foo")
+	fnc := NewFuncSpec("bar")
+	st.AttachMethod(st.MethodFromFunction("f", false, fnc))
 	actual := st.String()
 
 	c.Assert(actual, Equals, expected)

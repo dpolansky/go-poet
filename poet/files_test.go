@@ -161,3 +161,16 @@ func (f *FilesSuite) TestFileInitFunction(c *C) {
 	actual := fspec.String()
 	c.Assert(actual, Equals, expected)
 }
+
+func (f *FilesSuite) TestFileInitFunctionPanicsWithWrongName(c *C) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
+
+	fspec := NewFileSpec("foo")
+	initFunc := NewFuncSpec("bar")
+	fspec.InitFunction(initFunc)
+
+	c.Fail()
+}

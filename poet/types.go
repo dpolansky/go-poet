@@ -8,39 +8,64 @@ import (
 	"strings"
 )
 
+// UnqualifiedPrefix The prefix for type aliases that will be interpreted as unqualified
 const UnqualifiedPrefix = "_unqualified"
 
 var (
-	String     = TypeReferenceFromInstance("")
-	Bool       = TypeReferenceFromInstance(false)
-	Int        = TypeReferenceFromInstance(0)
-	Int8       = TypeReferenceFromInstance(int8(0))
-	Int16      = TypeReferenceFromInstance(int16(0))
-	Int32      = TypeReferenceFromInstance(int32(0))
-	Int64      = TypeReferenceFromInstance(int64(0))
-	Uint       = TypeReferenceFromInstance(uint(0))
-	Uint8      = TypeReferenceFromInstance(uint8(0))
-	Uint16     = TypeReferenceFromInstance(uint16(0))
-	Uint32     = TypeReferenceFromInstance(uint32(0))
-	Uint64     = TypeReferenceFromInstance(uint64(0))
-	Uintptr    = TypeReferenceFromInstance(uintptr(0))
-	Float32    = TypeReferenceFromInstance(float32(0))
-	Float64    = TypeReferenceFromInstance(float64(0))
-	Complex64  = TypeReferenceFromInstance(complex64(0))
+	// String A TypeReference for string
+	String = TypeReferenceFromInstance("")
+	// Bool A TypeReference for bool
+	Bool = TypeReferenceFromInstance(false)
+	// Int A TypeReference for int
+	Int = TypeReferenceFromInstance(0)
+	// Int8 A TypeReference for int8
+	Int8 = TypeReferenceFromInstance(int8(0))
+	// Int16 A TypeReference for int16
+	Int16 = TypeReferenceFromInstance(int16(0))
+	// Int32 A TypeReference for int32
+	Int32 = TypeReferenceFromInstance(int32(0))
+	// Int64 A TypeReference for int64
+	Int64 = TypeReferenceFromInstance(int64(0))
+	// Uint A TypeReference for uint
+	Uint = TypeReferenceFromInstance(uint(0))
+	// Uint8 A TypeReference for uint8
+	Uint8 = TypeReferenceFromInstance(uint8(0))
+	// Uint16 A TypeReference for uint16
+	Uint16 = TypeReferenceFromInstance(uint16(0))
+	// Uint32 A TypeReference for uint32
+	Uint32 = TypeReferenceFromInstance(uint32(0))
+	// Uint64 A TypeReference for uint64
+	Uint64 = TypeReferenceFromInstance(uint64(0))
+	// Uintptr A TypeReference for uintptr
+	Uintptr = TypeReferenceFromInstance(uintptr(0))
+	// Float32 A TypeReference for float32
+	Float32 = TypeReferenceFromInstance(float32(0))
+	// Float64 A TypeReference for float64
+	Float64 = TypeReferenceFromInstance(float64(0))
+	// Complex64 A TypeReference for complex64
+	Complex64 = TypeReferenceFromInstance(complex64(0))
+	// Complex128 A TypeReference for complex128
 	Complex128 = TypeReferenceFromInstance(complex128(0))
-	Byte       = TypeReferenceFromInstanceWithCustomName(uint8(0), "byte")
-	Rune       = TypeReferenceFromInstanceWithCustomName(int32(0), "rune")
+	// Byte A TypeReference for byte
+	Byte = TypeReferenceFromInstanceWithCustomName(uint8(0), "byte")
+	// Rune A TypeReference for rune
+	Rune = TypeReferenceFromInstanceWithCustomName(int32(0), "rune")
 )
 
-// TypeReferenceFromInstance creates an TypeReference from an existing type
+// TypeReferenceFromInstance creates a TypeReference from an instance of a variable
 func TypeReferenceFromInstance(t interface{}) TypeReference {
 	return newTypeReferenceFromInstance(t, "")
 }
 
+// TypeReferenceFromInstanceWithAlias creates a TypeReference from an instance of a variable
+// with the given package alias
 func TypeReferenceFromInstanceWithAlias(t interface{}, alias string) TypeReference {
 	return newTypeReferenceFromInstance(t, alias)
 }
 
+// TypeReferenceFromInstanceWithCustomName creates a TypeReference from an instance of a variable
+// with the given custom name, for use of a type alias's name rather than the underlying
+// reflect type.
 func TypeReferenceFromInstanceWithCustomName(t interface{}, name string) TypeReference {
 	typeRef := &typeReferenceWithCustomName{
 		TypeReference: newTypeReferenceFromInstance(t, ""),

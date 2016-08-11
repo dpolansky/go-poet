@@ -2,9 +2,8 @@ package poet
 
 import "bytes"
 
+// MethodSpec represents a method, with a receiver name and type.
 type MethodSpec struct {
-	// CodeBlock
-
 	FuncSpec
 	ReceiverName string
 	Receiver     TypeReference
@@ -12,6 +11,7 @@ type MethodSpec struct {
 
 var _ CodeBlock = (*MethodSpec)(nil)
 
+// NewMethodSpec creates a new method with the given method name, receiverName, and receiver type.
 func NewMethodSpec(name, receiverName string, receiver TypeReference) *MethodSpec {
 	return &MethodSpec{
 		FuncSpec: FuncSpec{

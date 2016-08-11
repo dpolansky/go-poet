@@ -72,10 +72,6 @@ func (f *FileSpec) String() string {
 	// create a new array with codeBlocks
 	var codeBlocks []CodeBlock
 	if f.Init != nil {
-		if f.Init.Name != "init" {
-			panic(fmt.Sprintf("the init function must be named 'init' (got '%s')", f.Init.Name))
-		}
-
 		codeBlocks = append([]CodeBlock{f.Init}, f.CodeBlocks...)
 	} else {
 		codeBlocks = append([]CodeBlock(nil), f.CodeBlocks...)
@@ -103,6 +99,10 @@ func (f *FileSpec) CodeBlock(blk CodeBlock) *FileSpec {
 
 // InitFunction assign an init function
 func (f *FileSpec) InitFunction(blk *FuncSpec) *FileSpec {
+	if blk.Name != "init" {
+		panic(fmt.Sprintf("the init function must be named 'init' (got '%s')", f.Init.Name))
+	}
+
 	f.Init = blk
 	return f
 }

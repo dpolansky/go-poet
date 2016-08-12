@@ -24,65 +24,71 @@ func NewFileSpec(pkg string) *FileSpec {
 
 // String produces the final go file string
 func (f *FileSpec) String() string {
-	var buffer bytes.Buffer
-	didStartImportBlock := false
-
-	buffer.WriteString("package " + f.Package + "\n\n")
 	seen := map[string]struct{}{}
+	b := &bytes.Buffer{}
 
+	b.WriteString("package " + f.Package + "\n\n")
+
+	// Collect the imports from each code block
 	var packages []Import
 	for _, blk := range f.CodeBlocks {
 		packages = append(packages, blk.GetImports()...)
 	}
 
-	for _, imp := range f.InitializationPackages {
-		if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
-			if !didStartImportBlock {
-				buffer.WriteString("import (\n")
-				didStartImportBlock = true
-			}
+	// if there are packages to write
+	if hasExternalImports(packages) || hasExternalImports(f.InitializationPackages) {
+		b.WriteString("import (\n")
 
-			buffer.WriteString("\t_ ")
-			buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
-			seen[imp.GetPackage()] = struct{}{}
-		}
+		// initialization packages should have an _ for an alias if no alias is specified
+		writeImports(b, f.InitializationPackages, seen, true)
+		writeImports(b, packages, seen, false)
+
+		b.WriteString(")\n\n")
 	}
 
-	for _, imp := range packages {
-		if _, found := seen[imp.GetPackage()]; !found && imp.GetPackage() != "" {
-			if !didStartImportBlock {
-				buffer.WriteString("import (\n")
-				didStartImportBlock = true
-			}
-
-			buffer.WriteString("\t")
-			if imp.GetAlias() != "" {
-				buffer.WriteString(imp.GetAlias())
-				buffer.WriteString(" ")
-			}
-			buffer.WriteString("\"" + imp.GetPackage() + "\"\n")
-			seen[imp.GetPackage()] = struct{}{}
-		}
-	}
-
-	if didStartImportBlock {
-		buffer.WriteString(")\n\n")
-	}
-
-	// create a new array with codeBlocks
-	var codeBlocks []CodeBlock
 	if f.Init != nil {
-		codeBlocks = append([]CodeBlock{f.Init}, f.CodeBlocks...)
-	} else {
-		codeBlocks = append([]CodeBlock(nil), f.CodeBlocks...)
+		b.WriteString(f.Init.String() + "\n")
 	}
 
-	for _, codeBlk := range codeBlocks {
-		buffer.WriteString(codeBlk.String())
-		buffer.WriteString("\n")
+	for _, blk := range f.CodeBlocks {
+		b.WriteString(blk.String() + "\n")
 	}
 
-	return buffer.String()
+	return b.String()
+}
+
+// Returns whether a slice of imports has external or non-primitive imports
+func hasExternalImports(imports []Import) bool {
+	for _, i := range imports {
+		if i.GetPackage() != "" {
+			return true
+		}
+	}
+
+	return false
+}
+
+// Writes imports to a buffer, using the specified fallbackAlias if an import does not have a specified
+// alias (in the case of initialization imports)
+func writeImports(b *bytes.Buffer, imports []Import, seen map[string]struct{}, isInitialization bool) {
+	for _, i := range imports {
+		// skip any non-external packages
+		if i.GetPackage() == "" {
+			continue
+		}
+
+		b.WriteString("\t")
+
+		if isInitialization {
+			// initialization packages should be prefixed with an _
+			b.WriteString("_ ")
+		} else if i.GetAlias() != "" {
+			b.WriteString(i.GetAlias() + " ")
+		}
+
+		b.WriteString("\"" + i.GetPackage() + "\"\n")
+		seen[i.GetPackage()] = struct{}{}
+	}
 }
 
 // InitializationPackage appends an initialization package for its side effects

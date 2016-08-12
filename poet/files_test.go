@@ -42,6 +42,44 @@ func (f *FilesSuite) TestFileImports(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (f *FilesSuite) TestFileEmptyImports(c *C) {
+	expected := "" +
+		"package foo\n" +
+		"\n" +
+		"func blah(a string) {\n" +
+		"}\n" +
+		"\n"
+
+	fspec := NewFileSpec("foo")
+	fnc := NewFuncSpec("blah").Parameter("a", String)
+
+	fspec.CodeBlock(fnc)
+
+	actual := fspec.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FilesSuite) TestFileOnlyIncludesExternalImports(c *C) {
+	expected := "" +
+		"package foo\n" +
+		"\n" +
+		"import (\n" +
+		"\t\"bytes\"\n" +
+		")\n" +
+		"\n" +
+		"func blah(a string, b *bytes.Buffer) {\n" +
+		"}\n" +
+		"\n"
+
+	fspec := NewFileSpec("foo")
+	fnc := NewFuncSpec("blah").Parameter("a", String).Parameter("b", TypeReferenceFromInstance(&bytes.Buffer{}))
+
+	fspec.CodeBlock(fnc)
+
+	actual := fspec.String()
+	c.Assert(actual, Equals, expected)
+}
+
 func (f *FilesSuite) TestFileImportsWithAlias(c *C) {
 	expected := "" +
 		"package foo\n" +

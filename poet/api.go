@@ -1,3 +1,5 @@
+// Package poet provides an API for generating Go constructs in a type-safe and
+// reusable way.
 package poet
 
 // CodeBlock represent a block of code that can be included in a File

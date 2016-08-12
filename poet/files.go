@@ -7,6 +7,7 @@ import (
 
 // FileSpec represents a .go source file
 type FileSpec struct {
+	Comment                string
 	Package                string      // Package that the file belongs to
 	InitializationPackages []Import    // InitializationPackages include any imports that need to be included for their side effects
 	Init                   *FuncSpec   // Init is a single function to be outputted before all CodeBlocks
@@ -27,6 +28,9 @@ func (f *FileSpec) String() string {
 	seen := map[string]struct{}{}
 	b := &bytes.Buffer{}
 
+	if f.Comment != "" {
+		b.WriteString("// " + f.Comment + "\n")
+	}
 	b.WriteString("package " + f.Package + "\n\n")
 
 	// Collect the imports from each code block
@@ -151,4 +155,10 @@ func (f *FileSpec) VariableGrouping() *VariableGrouping {
 	v := &VariableGrouping{}
 	f.CodeBlocks = append(f.CodeBlocks, v)
 	return v
+}
+
+// FileComment sets the file's comment to the given input string.
+func (f *FileSpec) FileComment(comment string) *FileSpec {
+	f.Comment = comment
+	return f
 }

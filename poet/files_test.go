@@ -212,3 +212,22 @@ func (f *FilesSuite) TestFileInitFunctionPanicsWithWrongName(c *C) {
 
 	c.Fail()
 }
+
+func (f *FilesSuite) TestFileComment(c *C) {
+	expected := "" +
+		"// This is a comment.\n" +
+		"package foo\n" +
+		"\n"
+
+	actual := NewFileSpec("foo").FileComment("This is a comment.").String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FilesSuite) TestFileDoesNotShowEmptyComment(c *C) {
+	expected := "" +
+		"package foo\n" +
+		"\n"
+
+	actual := NewFileSpec("foo").String()
+	c.Assert(actual, Equals, expected)
+}

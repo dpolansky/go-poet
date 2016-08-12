@@ -16,6 +16,16 @@ func (f *ImportsSuite) TestQualifiedImport(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (f *ImportsSuite) TestQualifiedImportWithSlashes(c *C) {
+	expected := "context."
+	imp := &ImportSpec{
+		Package:   "golang.org/x/net/context",
+		Qualified: true,
+	}
+	actual := imp.getQualifier()
+	c.Assert(actual, Equals, expected)
+}
+
 func (f *ImportsSuite) TestUnqualifiedImport(c *C) {
 	expected := ""
 	imp := &ImportSpec{

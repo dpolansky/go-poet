@@ -1,6 +1,9 @@
 package poet
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 // ImportSpec implements Import to represent an imported go package
 type ImportSpec struct {
@@ -21,7 +24,13 @@ func (i *ImportSpec) getQualifier() string {
 	if i.Alias != "" {
 		result.WriteString(i.Alias)
 	} else {
-		result.WriteString(i.Package)
+		// the package may contain slashes, so only write the base name of the package,
+		// not the full package
+		pkg := i.Package
+		if ndx := strings.LastIndex(pkg, "/"); ndx != -1 {
+			pkg = pkg[ndx+1:]
+		}
+		result.WriteString(pkg)
 	}
 	result.WriteString(".")
 

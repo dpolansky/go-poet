@@ -64,50 +64,66 @@ func (f *FuncSpec) createSignature() statement {
 
 // Signature returns a format string and slice of arguments for the function's signature, not
 // including the starting "func" or opening curly brace
-func (f *FuncSpec) Signature() (_ string, arguments []interface{}) {
-	formatStr := bytes.Buffer{}
+func (f *FuncSpec) Signature() (string, []interface{}) {
+	// create a buffer for the format string and a slice for the arguments to the format string
+	b := bytes.Buffer{}
+	arguments := []interface{}{}
 
-	formatStr.WriteString(f.Name)
-	formatStr.WriteString("(")
+	// write the function name
+	b.WriteString(f.Name)
+	b.WriteString("(")
 
-	for i, param := range f.Parameters {
-		formatStr.WriteString("$L $T")
-		if param.Variadic {
-			formatStr.WriteString("...")
+	// write each parameter and collect any arguments
+	format, args := writeParameters(f.Parameters)
+	b.WriteString(format)
+	b.WriteString(")")
+	arguments = append(arguments, args...)
+
+	format, args = writeParameters(f.ResultParameters)
+	l := len(f.ResultParameters)
+
+	// if there is only one parameter and the parameter is unnamed, do not wrap it in parens
+	if l == 1 && f.ResultParameters[0].Name == "" {
+		b.WriteString(" ")
+		b.WriteString(format)
+	} else if l >= 1 {
+		b.WriteString(" (")
+		b.WriteString(format)
+		b.WriteString(")")
+	}
+	arguments = append(arguments, args...)
+
+	return b.String(), arguments
+}
+
+func writeParameters(params []IdentifierParameter) (string, []interface{}) {
+	b := bytes.Buffer{}
+	args := []interface{}{}
+
+	for i, p := range params {
+		// if the argument is named, add its name to the format string
+		if p.Name != "" {
+			b.WriteString("$L ")
+			args = append(args, p.Name)
 		}
 
-		arguments = append(arguments, param.Name, param.Type)
+		// add its type
+		b.WriteString("$T")
+		args = append(args, p.Type)
 
-		if i != len(f.Parameters)-1 {
-			formatStr.WriteString(", ")
+		// if the argument is variadic, add the '...', will never happen for
+		// result parameters
+		if p.Variadic {
+			b.WriteString("...")
+		}
+
+		// if its not the last parameter, add a comma
+		if i != len(params)-1 {
+			b.WriteString(", ")
 		}
 	}
 
-	formatStr.WriteString(")")
-
-	if len(f.ResultParameters) == 1 && f.ResultParameters[0].Name == "" {
-		formatStr.WriteString(" $T")
-		arguments = append(arguments, f.ResultParameters[0].Type)
-	} else if len(f.ResultParameters) >= 1 {
-
-		formatStr.WriteString(" (")
-		for i, resultParameter := range f.ResultParameters {
-			if resultParameter.Name != "" {
-				formatStr.WriteString("$L ")
-				arguments = append(arguments, resultParameter.Name)
-			}
-
-			formatStr.WriteString("$T")
-			arguments = append(arguments, resultParameter.Type)
-
-			if i != len(f.ResultParameters)-1 {
-				formatStr.WriteString(", ")
-			}
-		}
-		formatStr.WriteString(")")
-	}
-
-	return formatStr.String(), arguments
+	return b.String(), args
 }
 
 // GetImports returns a slice of imports that this function needs, including

@@ -6,6 +6,7 @@ import (
 	IoAlias "io"
 	"os"
 
+	"golang.org/x/net/context"
 	. "gopkg.in/check.v1"
 )
 
@@ -16,6 +17,14 @@ var _ = Suite(&TypeSuite{})
 func (s *TypeSuite) TestFunctionRef(c *C) {
 	expected := "fmt.Println"
 	typeRef := TypeReferenceFromInstance(fmt.Println)
+	actual := typeRef.GetName()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (s *TypeSuite) TestFunctionRefFromExternal(c *C) {
+	expected := "context.Background"
+	typeRef := TypeReferenceFromInstance(context.Background)
 	actual := typeRef.GetName()
 
 	c.Assert(actual, Equals, expected)

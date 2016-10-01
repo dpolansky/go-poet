@@ -203,16 +203,17 @@ type typeReferenceFunc struct {
 var _ TypeReference = (*typeReferenceFunc)(nil)
 
 func newTypeReferenceFromFunction(t interface{}, alias string) TypeReference {
-	funcPtr := runtime.FuncForPC(reflect.ValueOf(t).Pointer())
-	fullyQualifiedPieces := strings.Split(funcPtr.Name(), ".")
+	// split up the function's name from its package path
+	n := runtime.FuncForPC(reflect.ValueOf(t).Pointer()).Name()
+	ndxOfLastDot := strings.LastIndex(n, ".")
 
 	return &typeReferenceFunc{
 		Import: &ImportSpec{
 			Qualified: true,
-			Package:   fullyQualifiedPieces[0],
+			Package:   n[:ndxOfLastDot],
 			Alias:     alias,
 		},
-		Name: fullyQualifiedPieces[1],
+		Name: n[ndxOfLastDot+1:],
 	}
 }
 

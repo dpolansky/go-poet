@@ -1,5 +1,8 @@
 package poet
 
+var _ CodeBlock = (*InterfaceSpec)(nil)
+var _ TypeReference = (*InterfaceSpec)(nil)
+
 // InterfaceSpec represents an interface
 type InterfaceSpec struct {
 	// CodeBlock
@@ -29,8 +32,6 @@ func (i *InterfaceSpec) EmbedInterface(interfaceType TypeReference) *InterfaceSp
 	return i
 }
 
-var _ CodeBlock = (*InterfaceSpec)(nil)
-
 // GetImports returns Import's used by the interface
 func (i *InterfaceSpec) GetImports() []Import {
 	packages := []Import{}
@@ -44,6 +45,11 @@ func (i *InterfaceSpec) GetImports() []Import {
 	}
 
 	return packages
+}
+
+// GetName returns the name and fulfills TypeReference.
+func (i *InterfaceSpec) GetName() string {
+	return i.Name
 }
 
 // String outputs the interface declaration

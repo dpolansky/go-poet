@@ -17,6 +17,7 @@ func (f *InterfaceSuite) TestBlankInterface(c *C) {
 	i := NewInterfaceSpec("NewInterface")
 	actual := i.String()
 	c.Assert(actual, Equals, expected)
+	c.Assert(i.GetName(), Equals, "NewInterface")
 }
 
 func (f *InterfaceSuite) TestBlankInterfaceWithComment(c *C) {

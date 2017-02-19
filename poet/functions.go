@@ -2,6 +2,7 @@ package poet
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // FuncSpec represents information needed to write a function
@@ -10,7 +11,7 @@ type FuncSpec struct {
 	Comment          string
 	Parameters       []IdentifierParameter
 	ResultParameters []IdentifierParameter
-	Statements       []statement
+	Statements       []Statement
 }
 
 var _ CodeBlock = (*FuncSpec)(nil)
@@ -21,7 +22,7 @@ func NewFuncSpec(name string) *FuncSpec {
 		Name:             name,
 		Parameters:       []IdentifierParameter{},
 		ResultParameters: []IdentifierParameter{},
-		Statements:       []statement{},
+		Statements:       []Statement{},
 	}
 }
 
@@ -30,38 +31,19 @@ func (f *FuncSpec) String() string {
 	writer := newCodeWriter()
 
 	if f.Comment != "" {
-		writer.WriteComment(f.Comment)
+		writer.WriteCodeBlock(Comment(f.Comment))
 	}
 
-	writer.WriteStatement(f.createSignature())
+	signature, args := f.Signature()
+	writer.WriteStatement(newStatement(0, 1, fmt.Sprintf("func %s {", signature), args...))
 
 	for _, st := range f.Statements {
 		writer.WriteStatement(st)
 	}
 
-	writer.WriteStatement(statement{
-		BeforeIndent: -1,
-		Format:       "}",
-	})
+	writer.WriteStatement(newStatement(-1, 0, "}"))
 
 	return writer.String()
-}
-
-// createSignature generates the function's signature as a statement, starting from "func" and ending with
-// the opening curly brace.
-func (f *FuncSpec) createSignature() statement {
-	formatStr := bytes.Buffer{}
-	signature, args := f.Signature()
-
-	formatStr.WriteString("func ")
-	formatStr.WriteString(signature)
-	formatStr.WriteString(" {")
-
-	return statement{
-		AfterIndent: 1,
-		Format:      formatStr.String(),
-		Arguments:   args,
-	}
 }
 
 // Signature returns a format string and slice of arguments for the function's signature, not
@@ -154,10 +136,7 @@ func (f *FuncSpec) GetImports() []Import {
 
 // Statement is a convenient method to append a statement to the function
 func (f *FuncSpec) Statement(format string, args ...interface{}) *FuncSpec {
-	f.Statements = append(f.Statements, statement{
-		Format:    format,
-		Arguments: args,
-	})
+	f.Statements = append(f.Statements, newStatement(0, 0, format, args...))
 
 	return f
 }
@@ -165,11 +144,7 @@ func (f *FuncSpec) Statement(format string, args ...interface{}) *FuncSpec {
 // BlockStart is a convenient method to append a statement that marks the start of a
 // block of code.
 func (f *FuncSpec) BlockStart(format string, args ...interface{}) *FuncSpec {
-	f.Statements = append(f.Statements, statement{
-		Format:      format + " {",
-		Arguments:   args,
-		AfterIndent: 1,
-	})
+	f.Statements = append(f.Statements, newStatement(0, 1, format+" {", args...))
 
 	return f
 }
@@ -177,10 +152,7 @@ func (f *FuncSpec) BlockStart(format string, args ...interface{}) *FuncSpec {
 // BlockEnd is a convenient method to append a statement that marks the end of a
 // block of code.
 func (f *FuncSpec) BlockEnd() *FuncSpec {
-	f.Statements = append(f.Statements, statement{
-		Format:       "}",
-		BeforeIndent: -1,
-	})
+	f.Statements = append(f.Statements, newStatement(-1, 0, "}"))
 
 	return f
 }

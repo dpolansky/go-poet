@@ -109,13 +109,9 @@ func (f *FileSpec) FileComment(comment string) *FileSpec {
 
 func (f *FileSpec) writeHeader(w *codeWriter) {
 	if f.Comment != "" {
-		w.WriteComment(f.Comment)
+		w.WriteCodeBlock(Comment(f.Comment))
 	}
-
-	w.WriteStatement(statement{
-		Format:    "package $L\n",
-		Arguments: []interface{}{f.Package},
-	})
+	w.WriteStatement(newStatement(0, 0, "package $L\n", f.Package))
 }
 
 func (f *FileSpec) writeImports(w *codeWriter) {
@@ -124,35 +120,28 @@ func (f *FileSpec) writeImports(w *codeWriter) {
 		return
 	}
 
-	w.WriteStatement(statement{
-		Format:      "import (",
-		AfterIndent: 1,
-	})
+	w.WriteStatement(newStatement(0, 1, "import ("))
 	for _, i := range imports {
 		var prefix string
 		if i.GetAlias() != "" {
 			prefix = i.GetAlias() + " "
 		}
-		w.WriteStatement(statement{
-			Format:    "$L$S",
-			Arguments: []interface{}{prefix, i.GetPackage()},
-		})
+		w.WriteStatement(newStatement(0, 0, "$L$S", prefix, i.GetPackage()))
 	}
-	w.WriteStatement(statement{
-		Format:       ")\n",
-		BeforeIndent: -1,
-	})
+	w.WriteStatement(newStatement(-1, 0, ")\n"))
 }
 
 func (f *FileSpec) writeInitFunc(w *codeWriter) {
 	if f.Init != nil {
-		w.WriteStatement(statement{Format: f.Init.String()})
+		w.WriteCodeBlock(f.Init)
+		w.WriteStatement(Statement{})
 	}
 }
 
 func (f *FileSpec) writeCodeBlocks(w *codeWriter) {
 	for _, blk := range f.CodeBlocks {
-		w.WriteStatement(statement{Format: blk.String()})
+		w.WriteCodeBlock(blk)
+		w.WriteStatement(Statement{})
 	}
 }
 

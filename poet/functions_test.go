@@ -112,7 +112,7 @@ func (f *FunctionsSuite) TestFunctionComment(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
-func (f *FunctionsSuite) TestBlockStatements(c *C) {
+func (f *FunctionsSuite) TestFunctionBlockStatements(c *C) {
 	expected := "" +
 		"func foo() {\n" +
 		"\tfor i:=0; i<5; i++ {\n" +
@@ -125,6 +125,21 @@ func (f *FunctionsSuite) TestBlockStatements(c *C) {
 	fnc.Statement("$T($L)", TypeReferenceFromInstance(fmt.Println), "i")
 	fnc.BlockEnd()
 	actual := fnc.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FunctionsSuite) TestFunctionAnonymous(c *C) {
+	expected := "" +
+		"func (name string) string {\n" +
+		"\treturn fmt.Sprintf(\"hello %s\", name)\n" +
+		"}\n"
+
+	fnc := NewFuncSpec("")
+	fnc.Parameter("name", String)
+	fnc.Statement("return $T($S, $L)", TypeReferenceFromInstance(fmt.Sprintf), "hello %s", "name")
+	fnc.ResultParameter("", String)
+	actual := fnc.String()
+
 	c.Assert(actual, Equals, expected)
 }
 

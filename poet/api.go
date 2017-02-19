@@ -10,8 +10,8 @@ type CodeBlock interface {
 	GetImports() []Import
 }
 
-// statement represent a templated line of code.
-type statement struct {
+// Statement represent a templated line of code.
+type Statement struct {
 	Format       string        // Format specifies the format for the code
 	Arguments    []interface{} // Arguments are used within the format string
 	BeforeIndent int           // BeforeIndent augments the indent for the current statement.

@@ -1,7 +1,7 @@
 package poet
 
 import (
-	"bytes"
+	"fmt"
 )
 
 // MethodSpec represents a method, with a receiver name and type.
@@ -27,36 +27,16 @@ func NewMethodSpec(name, receiverName string, receiver TypeReference) *MethodSpe
 func (m *MethodSpec) String() string {
 	writer := newCodeWriter()
 
-	writer.WriteStatement(m.createSignature())
+	signature, args := m.Signature()
+	format := fmt.Sprintf("func ($L $T) %s {", signature)
+	args = append([]interface{}{m.ReceiverName, m.Receiver}, args...)
+	writer.WriteStatement(newStatement(0, 1, format, args...))
 
 	for _, st := range m.Statements {
 		writer.WriteStatement(st)
 	}
 
-	writer.WriteStatement(statement{
-		BeforeIndent: -1,
-		Format:       "}",
-	})
+	writer.WriteStatement(newStatement(-1, 0, "}"))
 
 	return writer.String()
-}
-
-func (m *MethodSpec) createSignature() statement {
-	formatStr := bytes.Buffer{}
-	signature, args := m.Signature()
-
-	formatStr.WriteString("func ")
-	formatStr.WriteString("(")
-	formatStr.WriteString(m.ReceiverName)
-	formatStr.WriteString(" ")
-	formatStr.WriteString(m.Receiver.GetName())
-	formatStr.WriteString(") ")
-	formatStr.WriteString(signature)
-	formatStr.WriteString(" {")
-
-	return statement{
-		AfterIndent: 1,
-		Format:      formatStr.String(),
-		Arguments:   args,
-	}
 }

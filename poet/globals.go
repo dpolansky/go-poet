@@ -2,6 +2,7 @@ package poet
 
 import (
 	"bytes"
+	"fmt"
 )
 
 // VariableGrouping represents a collection of variables and/or constants that will
@@ -110,21 +111,17 @@ func (v *Variable) GetImports() []Import {
 // GetDeclaration returns the name and type of this variable, for example: 'foo string'.
 func (v *Variable) GetDeclaration() string {
 	w := newCodeWriter()
-	w.WriteStatement(statement{
-		Format:    "$L $T = " + v.Format,
-		Arguments: append([]interface{}{v.Name, v.Type}, v.Args...),
-	})
+	args := append([]interface{}{v.Name, v.Type}, v.Args...)
+	w.WriteStatement(newStatement(0, 0, "$L $T = "+v.Format, args...))
 	return w.String()
 }
 
 func (v *Variable) String() string {
-	buff := bytes.Buffer{}
+	var prefix string
 	if v.Constant {
-		buff.WriteString("const ")
+		prefix = "const"
 	} else {
-		buff.WriteString("var ")
+		prefix = "var"
 	}
-	buff.WriteString(v.GetDeclaration())
-
-	return buff.String()
+	return fmt.Sprintf("%s %s", prefix, v.GetDeclaration())
 }

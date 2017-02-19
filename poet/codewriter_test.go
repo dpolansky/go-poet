@@ -19,7 +19,7 @@ func (f *CodeWriterSuite) TestCodeWriterSingleCode(c *C) {
 
 func (f *CodeWriterSuite) TestCodeWriterSingleStatement(c *C) {
 	expected := "this is a test\n"
-	s := statement{
+	s := Statement{
 		Format: "this is a test",
 	}
 	writer := &codeWriter{}
@@ -31,7 +31,7 @@ func (f *CodeWriterSuite) TestCodeWriterSingleStatement(c *C) {
 
 func (f *CodeWriterSuite) TestCodeWriterPreindentStatement(c *C) {
 	expected := "\t\tthis is a test\n"
-	s := statement{
+	s := Statement{
 		Format:       "this is a test",
 		BeforeIndent: 2,
 	}
@@ -49,19 +49,19 @@ func (f *CodeWriterSuite) TestCodeWriterMixedIndentStatement(c *C) {
 		"\tbut back\n"
 
 	writer := &codeWriter{}
-	writer.WriteStatement(statement{
+	writer.WriteStatement(Statement{
 		Format:       "this is a test",
 		BeforeIndent: 2,
 	})
-	writer.WriteStatement(statement{
+	writer.WriteStatement(Statement{
 		Format:       "still going",
 		BeforeIndent: -1,
 	})
-	writer.WriteStatement(statement{
+	writer.WriteStatement(Statement{
 		Format:       "gone",
 		BeforeIndent: -1,
 	})
-	writer.WriteStatement(statement{
+	writer.WriteStatement(Statement{
 		Format:       "but back",
 		BeforeIndent: 1,
 	})
@@ -70,23 +70,21 @@ func (f *CodeWriterSuite) TestCodeWriterMixedIndentStatement(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
-func (f *CodeWriterSuite) TestCodeWriterComment(c *C) {
-	expected := "// This is a comment\n"
-
+func (f *CodeWriterSuite) TestCodeWriterCodeBlock(c *C) {
+	expected := "" +
+		"type foo struct {\n" +
+		"}\n"
 	writer := &codeWriter{}
-	writer.WriteComment("This is a comment")
+	writer.WriteCodeBlock(NewStructSpec("foo"))
 	actual := writer.String()
 
 	c.Assert(actual, Equals, expected)
 }
 
-func (f *CodeWriterSuite) TestCodeWriterMultiLineComment(c *C) {
-	expected := "// This is\n" +
-		"// a multi\n" +
-		"// line comment\n"
-
+func (f *CodeWriterSuite) TestCodeWriterNewStatement(c *C) {
+	expected := "this is a test\n"
 	writer := &codeWriter{}
-	writer.WriteComment("This is\na multi\nline comment")
+	writer.WriteStatement(newStatement(0, 0, "$L $L $L $L", "this", "is", "a", "test"))
 	actual := writer.String()
 
 	c.Assert(actual, Equals, expected)

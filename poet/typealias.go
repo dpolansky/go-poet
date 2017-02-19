@@ -37,12 +37,9 @@ func (a *TypeAliasSpec) GetImports() []Import {
 func (a *TypeAliasSpec) String() string {
 	writer := newCodeWriter()
 	if a.Comment != "" {
-		writer.WriteComment(a.Comment)
+		writer.WriteCodeBlock(Comment(a.Comment))
 	}
+	writer.WriteStatement(newStatement(0, 0, "type $T $T", a, a.UnderlyingType))
 
-	writer.WriteStatement(statement{
-		Format:    "type $T $T",
-		Arguments: []interface{}{a, a.UnderlyingType},
-	})
 	return writer.String()
 }

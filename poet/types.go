@@ -2,11 +2,11 @@ package poet
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 	"runtime"
 	"strings"
-	"errors"
 )
 
 // UnqualifiedPrefix The prefix for type aliases that will be interpreted as unqualified

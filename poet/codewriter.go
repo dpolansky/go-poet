@@ -2,7 +2,6 @@ package poet
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 )
 
@@ -19,20 +18,20 @@ func newCodeWriter() *codeWriter {
 	}
 }
 
-// WriteComment writes a comment, which prepends "// " at the beginning of each line of the comment.
-func (c *codeWriter) WriteComment(comment string) {
-	c.buffer.WriteString(fmt.Sprintf("// %s\n", strings.Replace(comment, "\n", "\n// ", -1)))
-}
-
 // WriteCode writes code at the given indentation
 func (c *codeWriter) WriteCode(code string) {
 	c.buffer.WriteString(strings.Repeat("\t", c.currentIndent))
 	c.buffer.WriteString(code)
 }
 
+// WriteCodeBlock writes a code block at the given indentation
+func (c *codeWriter) WriteCodeBlock(block CodeBlock) {
+	c.WriteCode(block.String())
+}
+
 // WriteStatement writes a new line of code with the current indentation and augments
 // the indentation per the statement. A newline is appended at the end of the statement.
-func (c *codeWriter) WriteStatement(s statement) {
+func (c *codeWriter) WriteStatement(s Statement) {
 	c.currentIndent += s.BeforeIndent
 	c.WriteCode(template(s.Format, s.Arguments...) + "\n")
 	c.currentIndent += s.AfterIndent
@@ -41,4 +40,13 @@ func (c *codeWriter) WriteStatement(s statement) {
 // String gives a string with the code
 func (c *codeWriter) String() string {
 	return c.buffer.String()
+}
+
+func newStatement(beforeIndent, afterIndent int, format string, args ...interface{}) Statement {
+	return Statement{
+		BeforeIndent: beforeIndent,
+		AfterIndent:  afterIndent,
+		Format:       format,
+		Arguments:    args,
+	}
 }

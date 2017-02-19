@@ -32,7 +32,7 @@ func (i *InterfaceSpec) EmbedInterface(interfaceType TypeReference) *InterfaceSp
 	return i
 }
 
-// GetImports returns Import's used by the interface
+// GetImports returns Imports used by the interface
 func (i *InterfaceSpec) GetImports() []Import {
 	packages := []Import{}
 
@@ -56,39 +56,23 @@ func (i *InterfaceSpec) GetName() string {
 func (i *InterfaceSpec) String() string {
 	writer := newCodeWriter()
 	if i.Comment != "" {
-		writer.WriteComment(i.Comment)
+		writer.WriteCodeBlock(Comment(i.Comment))
 	}
-	writer.WriteStatement(statement{
-		Format:      "type $L interface {",
-		Arguments:   []interface{}{i.Name},
-		AfterIndent: 1,
-	})
+	writer.WriteStatement(newStatement(0, 1, "type $L interface {", i.Name))
 
 	for _, interf := range i.EmbeddedInterfaces {
-		writer.WriteStatement(statement{
-			Format:    "$L",
-			Arguments: []interface{}{interf.GetName()},
-		})
+		writer.WriteStatement(newStatement(0, 0, "$L", interf.GetName()))
 	}
 
 	for _, method := range i.Methods {
 		if method.Comment != "" {
-			writer.WriteStatement(statement{
-				Format:    "// $L",
-				Arguments: []interface{}{method.Comment},
-			})
+			writer.WriteStatement(newStatement(0, 0, "// $L", method.Comment))
 		}
 		signature, args := method.Signature()
-		writer.WriteStatement(statement{
-			Format:    signature,
-			Arguments: args,
-		})
+		writer.WriteStatement(newStatement(0, 0, signature, args...))
 	}
 
-	writer.WriteStatement(statement{
-		Format:       "}",
-		BeforeIndent: -1,
-	})
+	writer.WriteStatement(newStatement(-1, 0, "}"))
 
 	return writer.String()
 }

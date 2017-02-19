@@ -3,10 +3,10 @@ package poet
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	. "gopkg.in/check.v1"
-	"strings"
 )
 
 func _(t *testing.T) { TestingT(t) }
@@ -125,7 +125,7 @@ func (f *FilesSuite) TestFileRepeatedImports(c *C) {
 		"package foo\n" +
 		"\n" +
 		"import (\n" +
-			"\t_ \"bytes\"\n" +
+		"\t_ \"bytes\"\n" +
 		")\n" +
 		"\n"
 

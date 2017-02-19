@@ -38,14 +38,10 @@ func (s *StructSpec) String() string {
 	writer := newCodeWriter()
 
 	if s.Comment != "" {
-		writer.WriteComment(s.Comment)
+		writer.WriteCodeBlock(Comment(s.Comment))
 	}
 
-	writer.WriteStatement(statement{
-		Format:      "type $L struct {",
-		Arguments:   []interface{}{s.Name},
-		AfterIndent: 1,
-	})
+	writer.WriteStatement(newStatement(0, 1, "type $L struct {", s.Name))
 
 	for _, field := range s.Fields {
 		var format string
@@ -58,23 +54,17 @@ func (s *StructSpec) String() string {
 			format = "$L $T"
 		}
 
-		writer.WriteStatement(statement{
-			Format:    format,
-			Arguments: arguments,
-		})
+		writer.WriteStatement(newStatement(0, 0, format, arguments...))
 	}
-
-	writer.WriteStatement(statement{
-		Format:       "}",
-		BeforeIndent: -1,
-	})
+	writer.WriteStatement(newStatement(-1, 0, "}"))
 
 	if len(s.Methods) != 0 {
-		writer.WriteCode("\n")
+		writer.WriteStatement(Statement{})
 	}
 
 	for _, method := range s.Methods {
-		writer.WriteCode(method.String() + "\n")
+		writer.WriteCodeBlock(method)
+		writer.WriteStatement(Statement{})
 	}
 	return writer.String()
 }

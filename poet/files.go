@@ -1,7 +1,6 @@
 package poet
 
 import (
-	"bytes"
 	"fmt"
 )
 
@@ -11,7 +10,7 @@ type FileSpec struct {
 	Package                string      // Package that the file belongs to
 	InitializationPackages []Import    // InitializationPackages include any imports that need to be included for their side effects
 	Init                   *FuncSpec   // Init is a single function to be outputted before all CodeBlocks
-	CodeBlocks             []CodeBlock // CodeBlocks are appeneded and when outputted separated by a newline
+	CodeBlocks             []CodeBlock // CodeBlocks are appended and when outputted separated by a newline
 }
 
 // NewFileSpec constructs a new FileSpec with the given package name
@@ -25,79 +24,24 @@ func NewFileSpec(pkg string) *FileSpec {
 
 // String produces the final go file string
 func (f *FileSpec) String() string {
-	seen := map[string]struct{}{}
-	b := &bytes.Buffer{}
+	w := newCodeWriter()
 
-	if f.Comment != "" {
-		b.WriteString("// " + f.Comment + "\n")
-	}
-	b.WriteString("package " + f.Package + "\n\n")
+	f.writeHeader(w)
+	f.writeImports(w)
+	f.writeInitFunc(w)
+	f.writeCodeBlocks(w)
 
-	// Collect the imports from each code block
-	var packages []Import
-	for _, blk := range f.CodeBlocks {
-		packages = append(packages, blk.GetImports()...)
-	}
-
-	// if there are packages to write
-	if hasExternalImports(packages) || hasExternalImports(f.InitializationPackages) {
-		b.WriteString("import (\n")
-
-		// initialization packages should have an _ for an alias if no alias is specified
-		writeImports(b, f.InitializationPackages, seen, true)
-		writeImports(b, packages, seen, false)
-
-		b.WriteString(")\n\n")
-	}
-
-	if f.Init != nil {
-		b.WriteString(f.Init.String() + "\n")
-	}
-
-	for _, blk := range f.CodeBlocks {
-		b.WriteString(blk.String() + "\n")
-	}
-
-	return b.String()
-}
-
-// Returns whether a slice of imports has external or non-primitive imports
-func hasExternalImports(imports []Import) bool {
-	for _, i := range imports {
-		if i.GetPackage() != "" {
-			return true
-		}
-	}
-
-	return false
-}
-
-// Writes imports to a buffer, using the specified fallbackAlias if an import does not have a specified
-// alias (in the case of initialization imports)
-func writeImports(b *bytes.Buffer, imports []Import, seen map[string]struct{}, isInitialization bool) {
-	for _, i := range imports {
-		// skip any non-external packages
-		if i.GetPackage() == "" {
-			continue
-		}
-
-		b.WriteString("\t")
-
-		if isInitialization {
-			// initialization packages should be prefixed with an _
-			b.WriteString("_ ")
-		} else if i.GetAlias() != "" {
-			b.WriteString(i.GetAlias() + " ")
-		}
-
-		b.WriteString("\"" + i.GetPackage() + "\"\n")
-		seen[i.GetPackage()] = struct{}{}
-	}
+	return w.String()
 }
 
 // InitializationPackage appends an initialization package for its side effects
 func (f *FileSpec) InitializationPackage(imp Import) *FileSpec {
-	f.InitializationPackages = append(f.InitializationPackages, imp)
+	if imp.GetPackage() != "" {
+		f.InitializationPackages = append(f.InitializationPackages, &ImportSpec{
+			Package: imp.GetPackage(),
+			Alias:   "_",
+		})
+	}
 	return f
 }
 
@@ -161,4 +105,70 @@ func (f *FileSpec) VariableGrouping() *VariableGrouping {
 func (f *FileSpec) FileComment(comment string) *FileSpec {
 	f.Comment = comment
 	return f
+}
+
+func (f *FileSpec) writeHeader(w *codeWriter) {
+	if f.Comment != "" {
+		w.WriteStatement(statement{
+			Format:    "// $L",
+			Arguments: []interface{}{f.Comment},
+		})
+	}
+	w.WriteStatement(statement{
+		Format:    "package $L\n",
+		Arguments: []interface{}{f.Package},
+	})
+}
+
+func (f *FileSpec) writeImports(w *codeWriter) {
+	imports := collectImports(f.InitializationPackages, f.CodeBlocks)
+	if len(imports) == 0 {
+		return
+	}
+
+	w.WriteStatement(statement{
+		Format:      "import (",
+		AfterIndent: 1,
+	})
+	for _, i := range imports {
+		var prefix string
+		if i.GetAlias() != "" {
+			prefix = i.GetAlias() + " "
+		}
+		w.WriteStatement(statement{
+			Format:    "$L$S",
+			Arguments: []interface{}{prefix, i.GetPackage()},
+		})
+	}
+	w.WriteStatement(statement{
+		Format:       ")\n",
+		BeforeIndent: -1,
+	})
+}
+
+func (f *FileSpec) writeInitFunc(w *codeWriter) {
+	if f.Init != nil {
+		w.WriteStatement(statement{Format: f.Init.String()})
+	}
+}
+
+func (f *FileSpec) writeCodeBlocks(w *codeWriter) {
+	for _, blk := range f.CodeBlocks {
+		w.WriteStatement(statement{Format: blk.String()})
+	}
+}
+
+func collectImports(initPackages []Import, codeBlocks []CodeBlock) []Import {
+	var packages []Import
+	packages = append(packages, initPackages...)
+	// Collect the imports from each code block
+	for _, blk := range codeBlocks {
+		for _, i := range blk.GetImports() {
+			// external packages only
+			if i.GetPackage() != "" {
+				packages = append(packages, i)
+			}
+		}
+	}
+	return packages
 }

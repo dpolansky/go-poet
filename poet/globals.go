@@ -1,6 +1,8 @@
 package poet
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // VariableGrouping represents a collection of variables and/or constants that will
 // be separated into groups on output.
@@ -84,7 +86,7 @@ func writeGroupAsString(groupName string, vars []*Variable) string {
 
 	buf.WriteString(groupName + " (\n")
 	for _, v := range vars {
-		buf.WriteString("\t" + v.GetDeclaration() + "\n")
+		buf.WriteString("\t" + v.GetDeclaration())
 	}
 	buf.WriteString(")\n")
 	return buf.String()
@@ -107,11 +109,12 @@ func (v *Variable) GetImports() []Import {
 
 // GetDeclaration returns the name and type of this variable, for example: 'foo string'.
 func (v *Variable) GetDeclaration() string {
-	buff := bytes.Buffer{}
-	buff.WriteString(template("$L $T", v.Name, v.Type))
-	buff.WriteString(" = ")
-	buff.WriteString(template(v.Format, v.Args...))
-	return buff.String()
+	w := newCodeWriter()
+	w.WriteStatement(statement{
+		Format:    "$L $T = " + v.Format,
+		Arguments: append([]interface{}{v.Name, v.Type}, v.Args...),
+	})
+	return w.String()
 }
 
 func (v *Variable) String() string {
@@ -122,7 +125,6 @@ func (v *Variable) String() string {
 		buff.WriteString("var ")
 	}
 	buff.WriteString(v.GetDeclaration())
-	buff.WriteString("\n")
 
 	return buff.String()
 }

@@ -32,6 +32,12 @@ func (s *TemplateSuite) TestTemplateWithString(c *C) {
 	c.Assert(actual, Equals, expected)
 }
 
+func (s *TemplateSuite) TestTemplateWithIntLiterals(c *C) {
+	expected := "literal 1 string \"2\" type int"
+	actual := template("literal $L string $S type $T", 1, 2, TypeReferenceFromInstance(3))
+	c.Assert(actual, Equals, expected)
+}
+
 func (s *TemplateSuite) TestTemplatePanicsWithNotEnoughArgs(c *C) {
 	defer func() {
 		if r := recover(); r != nil {

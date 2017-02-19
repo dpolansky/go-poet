@@ -11,7 +11,7 @@ type codeWriter struct {
 	currentIndent int
 }
 
-// NewcodeWriter constructs a new codeWriter
+// newCodeWriter constructs a new codeWriter
 func newCodeWriter() *codeWriter {
 	return &codeWriter{
 		buffer: bytes.Buffer{},
@@ -24,7 +24,8 @@ func (c *codeWriter) WriteCode(code string) {
 	c.buffer.WriteString(code)
 }
 
-// WriteStatement writes a new line of code with the current indentation and augments the identation per the statement.
+// WriteStatement writes a new line of code with the current indentation and augments
+// the indentation per the statement. A newline is appended at the end of the statement.
 func (c *codeWriter) WriteStatement(s statement) {
 	c.currentIndent += s.BeforeIndent
 	c.WriteCode(template(s.Format, s.Arguments...) + "\n")

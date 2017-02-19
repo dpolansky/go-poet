@@ -2,7 +2,7 @@ package poet
 
 import (
 	"bytes"
-	"strings"
+	"path"
 )
 
 // ImportSpec implements Import to represent an imported go package
@@ -26,11 +26,7 @@ func (i *ImportSpec) getQualifier() string {
 	} else {
 		// the package may contain slashes, so only write the base name of the package,
 		// not the full package
-		pkg := i.Package
-		if ndx := strings.LastIndex(pkg, "/"); ndx != -1 {
-			pkg = pkg[ndx+1:]
-		}
-		result.WriteString(pkg)
+		result.WriteString(path.Base(i.Package))
 	}
 	result.WriteString(".")
 

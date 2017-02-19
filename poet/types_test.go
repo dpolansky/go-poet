@@ -93,30 +93,6 @@ func (s *TypeSuite) TestMapImports(c *C) {
 	c.Assert(actual, DeepEquals, expected)
 }
 
-func (s *TypeSuite) TestPrimitive(c *C) {
-	expected := "int"
-	typeRef := Int
-	actual := typeRef.GetName()
-
-	c.Assert(actual, Equals, expected)
-}
-
-func (s *TypeSuite) TestBoolean(c *C) {
-	expected := "bool"
-	typeRef := Bool
-	actual := typeRef.GetName()
-
-	c.Assert(actual, Equals, expected)
-}
-
-func (s *TypeSuite) TestByte(c *C) {
-	expected := "byte"
-	typeRef := Byte
-	actual := typeRef.GetName()
-
-	c.Assert(actual, Equals, expected)
-}
-
 func (s *TypeSuite) TestArray(c *C) {
 	expected := "[]int"
 	typeRef := TypeReferenceFromInstance([]int{})
@@ -166,4 +142,90 @@ func (s *TypeSuite) TestTypeReferencePanicsWithNilInstance(c *C) {
 
 	TypeReferenceFromInstance(nil)
 	c.Fail()
+}
+
+func (s *TypeSuite) TestTypePrimitives(c *C) {
+	for _, test := range []struct {
+		ref  TypeReference
+		name string
+	}{
+		{
+			String,
+			"string",
+		},
+		{
+			Bool,
+			"bool",
+		},
+		{
+			Int,
+			"int",
+		},
+		{
+			Int8,
+			"int8",
+		},
+		{
+			Int16,
+			"int16",
+		},
+		{
+			Int32,
+			"int32",
+		},
+		{
+			Int64,
+			"int64",
+		},
+		{
+			Uint,
+			"uint",
+		},
+		{
+			Uint8,
+			"uint8",
+		},
+		{
+			Uint16,
+			"uint16",
+		},
+		{
+			Uint32,
+			"uint32",
+		},
+		{
+			Uint64,
+			"uint64",
+		},
+		{
+			Uintptr,
+			"uintptr",
+		},
+		{
+			Float32,
+			"float32",
+		},
+		{
+			Float64,
+			"float64",
+		},
+		{
+			Complex64,
+			"complex64",
+		},
+		{
+			Complex128,
+			"complex128",
+		},
+		{
+			Byte,
+			"byte",
+		},
+		{
+			Rune,
+			"rune",
+		},
+	} {
+		c.Check(test.ref.GetName(), Equals, test.name)
+	}
 }

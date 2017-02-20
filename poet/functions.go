@@ -1,6 +1,8 @@
 package poet
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // FuncSpec represents information needed to write a function
 type FuncSpec struct {

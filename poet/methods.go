@@ -1,6 +1,8 @@
 package poet
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // MethodSpec represents a method, with a receiver name and type.
 type MethodSpec struct {

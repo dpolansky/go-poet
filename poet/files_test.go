@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	. "gopkg.in/check.v1"
+	"strings"
 )
 
 func _(t *testing.T) { TestingT(t) }
@@ -117,6 +118,52 @@ func (f *FilesSuite) TestFileInitializationImports(c *C) {
 
 	actual := fspec.String()
 	c.Assert(actual, Equals, expected)
+}
+
+func (f *FilesSuite) TestFileRepeatedImports(c *C) {
+	expected := "" +
+		"package foo\n" +
+		"\n" +
+		"import (\n" +
+			"\t_ \"bytes\"\n" +
+		")\n" +
+		"\n"
+
+	fspec := NewFileSpec("foo")
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "bytes",
+	})
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "bytes",
+	})
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "bytes",
+	})
+
+	actual := fspec.String()
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *FilesSuite) TestFileMultipleImports(c *C) {
+	fspec := NewFileSpec("foo")
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "bytes",
+	})
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "bytes",
+	})
+	fspec.InitializationPackage(&ImportSpec{
+		Package: "context",
+	})
+	fspec.CodeBlock(NewFuncSpec("blah").
+		Parameter("a", TypeReferenceFromInstance(&bytes.Buffer{})).
+		Parameter("b", TypeReferenceFromInstanceWithAlias(&bytes.Buffer{}, "blah")))
+
+	actual := fspec.String()
+	c.Assert(strings.Count(actual, "\t_ \"bytes\"\n"), Equals, 1)
+	c.Assert(strings.Count(actual, "\t_ \"context\"\n"), Equals, 1)
+	c.Assert(strings.Count(actual, "\tblah \"bytes\"\n"), Equals, 1)
+	c.Assert(strings.Count(actual, "\t\"bytes\"\n"), Equals, 1)
 }
 
 func (f *FilesSuite) TestFileGlobalVariable(c *C) {

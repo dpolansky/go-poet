@@ -159,16 +159,34 @@ func (f *FileSpec) writeCodeBlocks(w *codeWriter) {
 }
 
 func collectImports(initPackages []Import, codeBlocks []CodeBlock) []Import {
-	var packages []Import
-	packages = append(packages, initPackages...)
+	// map[Package]map[Alias]Import
+	packages := make(map[string]map[string]Import)
+	for _, i := range initPackages {
+		pkg := i.GetPackage()
+		if _, exists := packages[pkg]; !exists {
+			packages[pkg] = make(map[string]Import)
+		}
+		packages[i.GetPackage()][i.GetAlias()] = i
+	}
 	// Collect the imports from each code block
 	for _, blk := range codeBlocks {
 		for _, i := range blk.GetImports() {
+			pkg := i.GetPackage()
 			// external packages only
-			if i.GetPackage() != "" {
-				packages = append(packages, i)
+			if pkg != "" {
+				if _, exists := packages[pkg]; !exists {
+					packages[pkg] = make(map[string]Import)
+				}
+				packages[pkg][i.GetAlias()] = i
 			}
 		}
 	}
-	return packages
+
+	var pkgSlice []Import
+	for _, aliasMap := range packages {
+		for _, i := range aliasMap {
+			pkgSlice = append(pkgSlice, i)
+		}
+	}
+	return pkgSlice
 }

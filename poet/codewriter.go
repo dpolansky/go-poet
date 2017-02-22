@@ -2,6 +2,7 @@ package poet
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 )
 
@@ -16,6 +17,11 @@ func newCodeWriter() *codeWriter {
 	return &codeWriter{
 		buffer: bytes.Buffer{},
 	}
+}
+
+// WriteComment writes a comment, which prepends "// " at the beginning of each line of the comment.
+func (c *codeWriter) WriteComment(comment string) {
+	c.buffer.WriteString(fmt.Sprintf("// %s\n", strings.Replace(comment, "\n", "\n// ", -1)))
 }
 
 // WriteCode writes code at the given indentation

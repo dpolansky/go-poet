@@ -225,6 +225,10 @@ func (s *TypeSuite) TestTypePrimitives(c *C) {
 			Rune,
 			"rune",
 		},
+		{
+			Error,
+			"error",
+		},
 	} {
 		c.Check(test.ref.GetName(), Equals, test.name)
 	}

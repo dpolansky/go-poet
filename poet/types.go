@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"errors"
 )
 
 // UnqualifiedPrefix The prefix for type aliases that will be interpreted as unqualified
@@ -50,6 +51,8 @@ var (
 	Byte = TypeReferenceFromInstanceWithCustomName(uint8(0), "byte")
 	// Rune A TypeReference for rune
 	Rune = TypeReferenceFromInstanceWithCustomName(int32(0), "rune")
+	// Error A TypeReference for error
+	Error = TypeReferenceFromInstanceWithCustomName(errors.New(""), "error")
 )
 
 // TypeReferenceFromInstance creates a TypeReference from an instance of a variable

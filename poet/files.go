@@ -109,11 +109,9 @@ func (f *FileSpec) FileComment(comment string) *FileSpec {
 
 func (f *FileSpec) writeHeader(w *codeWriter) {
 	if f.Comment != "" {
-		w.WriteStatement(statement{
-			Format:    "// $L",
-			Arguments: []interface{}{f.Comment},
-		})
+		w.WriteComment(f.Comment)
 	}
+
 	w.WriteStatement(statement{
 		Format:    "package $L\n",
 		Arguments: []interface{}{f.Package},

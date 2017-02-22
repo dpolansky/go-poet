@@ -56,10 +56,7 @@ func (i *InterfaceSpec) GetName() string {
 func (i *InterfaceSpec) String() string {
 	writer := newCodeWriter()
 	if i.Comment != "" {
-		writer.WriteStatement(statement{
-			Format:    "// $L",
-			Arguments: []interface{}{i.Comment},
-		})
+		writer.WriteComment(i.Comment)
 	}
 	writer.WriteStatement(statement{
 		Format:      "type $L interface {",

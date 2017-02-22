@@ -18,15 +18,18 @@ func NewTypeAliasSpec(name string, typeRef TypeReference) *TypeAliasSpec {
 	}
 }
 
+// AliasComment adds a comment to a type alias.
 func (a *TypeAliasSpec) AliasComment(comment string) *TypeAliasSpec {
 	a.Comment = comment
 	return a
 }
 
+// GetName returns the alias for this Type Alias.
 func (a *TypeAliasSpec) GetName() string {
 	return a.Name
 }
 
+// GetImports returns a slice of imports that the aliased type requires.
 func (a *TypeAliasSpec) GetImports() []Import {
 	return a.UnderlyingType.GetImports()
 }
@@ -34,11 +37,9 @@ func (a *TypeAliasSpec) GetImports() []Import {
 func (a *TypeAliasSpec) String() string {
 	writer := newCodeWriter()
 	if a.Comment != "" {
-		writer.WriteStatement(statement{
-			Format:    "// $L",
-			Arguments: []interface{}{a.Comment},
-		})
+		writer.WriteComment(a.Comment)
 	}
+
 	writer.WriteStatement(statement{
 		Format:    "type $T $T",
 		Arguments: []interface{}{a, a.UnderlyingType},

@@ -38,7 +38,7 @@ func (s *StructSpec) String() string {
 	writer := newCodeWriter()
 
 	if s.Comment != "" {
-		writer.WriteCode("// " + s.Comment + "\n")
+		writer.WriteComment(s.Comment)
 	}
 
 	writer.WriteStatement(statement{

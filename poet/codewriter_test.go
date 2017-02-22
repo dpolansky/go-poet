@@ -69,3 +69,25 @@ func (f *CodeWriterSuite) TestCodeWriterMixedIndentStatement(c *C) {
 
 	c.Assert(actual, Equals, expected)
 }
+
+func (f *CodeWriterSuite) TestCodeWriterComment(c *C) {
+	expected := "// This is a comment\n"
+
+	writer := &codeWriter{}
+	writer.WriteComment("This is a comment")
+	actual := writer.String()
+
+	c.Assert(actual, Equals, expected)
+}
+
+func (f *CodeWriterSuite) TestCodeWriterMultiLineComment(c *C) {
+	expected := "// This is\n" +
+		"// a multi\n" +
+		"// line comment\n"
+
+	writer := &codeWriter{}
+	writer.WriteComment("This is\na multi\nline comment")
+	actual := writer.String()
+
+	c.Assert(actual, Equals, expected)
+}

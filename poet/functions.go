@@ -30,7 +30,7 @@ func (f *FuncSpec) String() string {
 	writer := newCodeWriter()
 
 	if f.Comment != "" {
-		writer.WriteCode("// " + f.Comment + "\n")
+		writer.WriteComment(f.Comment)
 	}
 
 	writer.WriteStatement(f.createSignature())

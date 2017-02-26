@@ -70,8 +70,7 @@ func (f *FileSpec) GlobalVariable(name string, typ TypeReference, format string,
 			Type: typ,
 		},
 		Constant: false,
-		Format:   format,
-		Args:     args,
+		Value:    newStatement(0, 0, format, args...),
 	}
 	f.CodeBlocks = append(f.CodeBlocks, v)
 	return f
@@ -86,8 +85,7 @@ func (f *FileSpec) GlobalConstant(name string, typ TypeReference, format string,
 			Type: typ,
 		},
 		Constant: true,
-		Format:   format,
-		Args:     args,
+		Value:    newStatement(0, 0, format, args...),
 	}
 	f.CodeBlocks = append(f.CodeBlocks, v)
 	return f

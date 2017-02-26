@@ -212,14 +212,18 @@ func (f *FilesSuite) TestFileGlobalVariableGrouping(c *C) {
 			Name: "c",
 			Type: TypeReferenceFromInstance(1),
 		},
-		Format: "$L", Args: []interface{}{1}, Constant: true,
+		Constant: true,
+		InGroup:  true,
+		Value:    newStatement(0, 0, "$L", 1),
 	}
 	variableB := &Variable{
 		Identifier: Identifier{
 			Name: "d",
 			Type: TypeReferenceFromInstance(1),
 		},
-		Format: "$L", Args: []interface{}{1}, Constant: false,
+		Constant: false,
+		InGroup:  true,
+		Value:    newStatement(0, 0, "$L", 1),
 	}
 
 	fspec := NewFileSpec("foo")

@@ -50,3 +50,14 @@ func newStatement(beforeIndent, afterIndent int, format string, args ...interfac
 		Arguments:    args,
 	}
 }
+
+// Appends two Statements without a newline.
+func appendStatements(first, second Statement) Statement {
+	args := append(first.Arguments, second.Arguments...)
+	return Statement{
+		BeforeIndent: first.BeforeIndent,
+		AfterIndent:  second.AfterIndent,
+		Format:       first.Format + second.Format,
+		Arguments:    args,
+	}
+}

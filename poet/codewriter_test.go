@@ -89,3 +89,63 @@ func (f *CodeWriterSuite) TestCodeWriterNewStatement(c *C) {
 
 	c.Assert(actual, Equals, expected)
 }
+
+func (f *CodeWriterSuite) TestCodeWriterAppendStatements(c *C) {
+	expected := Statement{
+		Format:       "var $L $T",
+		Arguments:    []interface{}{"c", Int},
+		BeforeIndent: 0,
+		AfterIndent:  1,
+	}
+	first := Statement{
+		Format:    "var $L ",
+		Arguments: []interface{}{"c"},
+	}
+	second := Statement{
+		Format:       "$T",
+		Arguments:    []interface{}{Int},
+		BeforeIndent: -1,
+		AfterIndent:  1,
+	}
+	actual := appendStatements(first, second)
+
+	c.Assert(actual, DeepEquals, expected)
+}
+
+func (f *CodeWriterSuite) TestCodeWriterAppendStatementsEmptyFirst(c *C) {
+	expected := Statement{
+		Format:       "$T",
+		Arguments:    []interface{}{Int},
+		BeforeIndent: 0,
+		AfterIndent:  1,
+	}
+	first := Statement{}
+	second := Statement{
+		Format:       "$T",
+		Arguments:    []interface{}{Int},
+		BeforeIndent: -1,
+		AfterIndent:  1,
+	}
+	actual := appendStatements(first, second)
+
+	c.Assert(actual, DeepEquals, expected)
+}
+
+func (f *CodeWriterSuite) TestCodeWriterAppendStatementsEmptySecond(c *C) {
+	expected := Statement{
+		Format:       "var $L",
+		Arguments:    []interface{}{"c"},
+		BeforeIndent: -1,
+		AfterIndent:  0,
+	}
+	first := Statement{
+		Format:       "var $L",
+		Arguments:    []interface{}{"c"},
+		BeforeIndent: -1,
+		AfterIndent:  1,
+	}
+	second := Statement{}
+	actual := appendStatements(first, second)
+
+	c.Assert(actual, DeepEquals, expected)
+}
